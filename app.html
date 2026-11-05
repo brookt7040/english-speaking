@@ -694,13 +694,15 @@ const CATS = {
   },
 };
 const MORE = ['more', 'better']; // 둘 다 인정
+const OWN = '__own__'; // 이유 드롭다운의 Your own: 학생이 문장을 직접 씀
+const REASON_WORDS = ['i love', 'i like', 'i enjoy', 'because'];
 const CAT_KEYS = ['seasons', 'subjects', 'food'].slice(0, CAT_COUNT);
 
 /* =========================================================
  * 저장 (localStorage)
  * ========================================================= */
 function emptyChoice() {
-  return { pair: null, pick: null, reason: '' };
+  return { pair: null, pick: null, reason: '', own: '' };
 }
 function defaultState() {
   const choices = {};
@@ -1466,7 +1468,13 @@ const itemOf = key => { const c = state.choices[key], p = pairOf(key); return p 
 function resolved(key) {
   const p = pairOf(key), i = itemOf(key), c = state.choices[key];
   const rs = i && i.reasons.find(x => x.en === c.reason);
-  return { pair: p, item: i ? i.en : '', itemKo: i ? i.ko : '', reason: rs ? rs.en : '', reasonKo: rs ? rs.ko : '' };
+  const isOwn = !!i && c.reason === OWN;
+  const own = isOwn ? clean(c.own) : '';
+  return {
+    pair: p, item: i ? i.en : '', itemKo: i ? i.ko : '', isOwn,
+    reason: isOwn ? own : rs ? rs.en : '', reasonKo: rs ? rs.ko : '',
+    sentence: isOwn ? own.charAt(0).toUpperCase() + own.slice(1) + '.' : rs ? reasonLine(rs.en) : '',
+  };
 }
 
 /** 저장된 값이 현재 목록에 없으면 비움 */
@@ -1475,7 +1483,8 @@ function sanitizeChoice(key) {
   if (!pairOf(key)) { c.pair = null; c.pick = null; }
   const i = itemOf(key);
   if (!i) c.pick = null;
-  if (!i || !i.reasons.some(x => x.en === c.reason)) c.reason = '';
+  if (!i || (c.reason !== OWN && !i.reasons.some(x => x.en === c.reason))) c.reason = '';
+  if (c.reason !== OWN) c.own = '';
 }
 
 function validate(key) {
@@ -1483,6 +1492,13 @@ function validate(key) {
   if (c.pair == null) miss.push('1번에서 비교할 두 가지를 골라 주세요.');
   if (c.pick == null) miss.push('2번에서 더 좋아하는 것을 골라 주세요.');
   if (!c.reason) miss.push('3번에서 이유를 골라 주세요.');
+  if (c.reason === OWN) {
+    const t = clean(c.own);
+    if (!t) miss.push('내 이유를 영어 문장으로 써 주세요.');
+    else if (!/^[A-Za-z0-9 ,.'’!?-]+$/.test(t)) miss.push('내 이유는 영어로 써 주세요.');
+    else if (normalize(t).split(' ').length < 4) miss.push('내 이유는 4단어 이상으로 써 주세요.');
+    else if (!fragPass(t, REASON_WORDS, PASS_SCORE)) miss.push('I love, I like, I enjoy, because 중 하나를 넣어 주세요.');
+  }
   return miss;
 }
 
@@ -1523,6 +1539,12 @@ function renderStep() {
       <div class="q">
         <div class="q-title"><span class="num">3</span> 왜 더 좋아하나요? <span class="en" style="font-weight:500;color:var(--muted)">I love ___ like ___.</span></div>
         <select id="reason" class="en"></select>
+        <div class="own" id="ownBox" hidden>
+          <label class="field"><span>내 이유를 영어 문장으로 써요</span>
+            <input type="text" id="ownReason" class="en" maxlength="80" autocomplete="off" placeholder="I love snowy days.">
+          </label>
+          <p class="sub"><b class="en">I love, I like, I enjoy, because</b> 중 하나를 넣고 <b>4단어 이상</b>으로 써요.</p>
+        </div>
       </div>
     </div>
 
@@ -1538,11 +1560,19 @@ function renderStep() {
   $$('input[name=pair]', panel).forEach(r => {
     r.checked = String(c.pair) === r.value;
     r.addEventListener('change', () => {
-      c.pair = Number(r.value); c.pick = null; c.reason = '';
+      c.pair = Number(r.value); c.pick = null; c.reason = ''; c.own = '';
       save(); fillChoices(key); updateStep();
     });
   });
-  $('#reason', panel).addEventListener('change', e => { c.reason = e.target.value; save(); updateStep(); });
+  $('#reason', panel).addEventListener('change', e => {
+    c.reason = e.target.value;
+    if (c.reason !== OWN) c.own = '';
+    $('#ownReason', panel).value = c.own;
+    save();
+    updateStep();
+    if (c.reason === OWN) $('#ownReason', panel).focus();
+  });
+  $('#ownReason', panel).addEventListener('input', e => { c.own = e.target.value; save(); updateStep(); });
   fillChoices(key);
   updateStep();
 }
@@ -1557,7 +1587,7 @@ function fillChoices(key) {
     </label>`).join('') : '';
   $('#pickNote', panel).textContent = p ? '' : '먼저 1번을 골라요.';
   $$('input[name=pick]', panel).forEach(r => r.addEventListener('change', () => {
-    c.pick = Number(r.value); c.reason = '';
+    c.pick = Number(r.value); c.reason = ''; c.own = '';
     save(); fillChoices(key); updateStep();
   }));
   const sel = $('#reason', panel);
@@ -1565,14 +1595,17 @@ function fillChoices(key) {
   sel.disabled = !i;
   sel.innerHTML = i
     ? opt('', '— 골라 주세요 —') + i.reasons.map(r => opt(r.en, `I love ${r.en}. (${r.ko})`)).join('')
+      + opt(OWN, 'Your own (내 답변 직접 쓰기)')
     : opt('', '— 먼저 2번을 골라요 —');
   sel.value = c.reason;
+  $('#ownReason', panel).value = c.own;
 }
 
 /** 입력이 바뀔 때마다: 미리보기 · 검사 · 버튼 상태만 갱신 */
 function updateStep() {
   const key = CAT_KEYS[state.step];
   const panel = $('#panel');
+  $('#ownBox', panel).hidden = state.choices[key].reason !== OWN;
   $$('.tab').forEach(t => t.classList.toggle('done', validate(t.dataset.key).length === 0));
 
   const r = resolved(key);
@@ -1582,7 +1615,7 @@ function updateStep() {
     ['them', `Which do you like more, ${slot(a)} or ${slot(b)}?`],
     ['me', `I like ${slot(r.item)} more.`],
     ['them', `Why do you like ${slot(r.item)} more?`],
-    ['me', `(It's because) I love ${slot(r.reason)}.`],
+    ['me', r.isOwn ? `${slot(r.sentence.replace(/\.$/, ''))}.` : `(It's because) I love ${slot(r.reason)}.`],
   ];
   $('#pv', panel).innerHTML = lines.map(([who, text]) => `
     <div class="line">
@@ -1671,10 +1704,12 @@ function buildRole(key, role) {
       ko: `내가 더 좋아하는 것을 말하세요. (${r.item})`,
       frags: ['i like', r.item, MORE], extras: [] },
     { id: 'A2', me: false, text: whyLine(r.item) },
-    { id: 'B2', me: true, free: true, text: reasonLine(r.reason),
-      tpl: `It's because I [love] ${r.reason.replace(' like ', ' [like] ')}.`,
-      ko: `더 좋아하는 이유를 말하세요. (${r.reasonKo})`,
-      frags: [['i love', 'i like', 'i enjoy', 'because']], extras: [] },
+    { id: 'B2', me: true, free: true, text: r.sentence,
+      tpl: r.isOwn
+        ? r.sentence.replace(/\b(love|like|enjoy|because)\b/i, '[$1]')
+        : `It's because I [love] ${r.reason.replace(' like ', ' [like] ')}.`,
+      ko: r.isOwn ? '내가 쓴 이유를 말하세요.' : `더 좋아하는 이유를 말하세요. (${r.reasonKo})`,
+      frags: [REASON_WORDS], extras: [] },
   ];
 }
 
