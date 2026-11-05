@@ -829,6 +829,7 @@ function fragmentScore(text, fragment) {
 }
 const PASS_SCORE = 0.8;
 /** 조각이 목록이면 그중 하나만 맞아도 인정 (예: more / better) */
+const endsWithBecause = t => /(^| )because$/.test(normalize(t));
 const fragLabel = f => [].concat(f).join(' / ');
 const fragPass = (text, f, min) => [].concat(f).some(x => fragmentScore(text, x) >= min);
 
@@ -1498,6 +1499,7 @@ function validate(key) {
     else if (!/^[A-Za-z0-9 ,.'’!?-]+$/.test(t)) miss.push('내 이유는 영어로 써 주세요.');
     else if (normalize(t).split(' ').length < 4) miss.push('내 이유는 4단어 이상으로 써 주세요.');
     else if (!fragPass(t, REASON_WORDS, PASS_SCORE)) miss.push('I love, I like, I enjoy, because 중 하나를 넣어 주세요.');
+    else if (endsWithBecause(t)) miss.push('because 뒤에 이유를 써 주세요.');
   }
   return miss;
 }
@@ -1732,10 +1734,15 @@ function scoreAlts(alts, line) {
   let best = null;
   alts.forEach(a => {
     const frags = line.frags.map(f => ({ f: fragLabel(f), ok: fragPass(a.text, f, PASS_SCORE) }));
-    if (line.free) frags.push({ f: '4단어 이상', ok: normalize(a.text).split(' ').length >= 4 });
+    if (line.free) {
+      frags.push({ f: '4단어 이상', ok: normalize(a.text).split(' ').length >= 4 });
+      // because로 말이 끝나면 이유를 말하지 않은 것: 이때만 조각으로 보여 준다
+      if (endsWithBecause(a.text)) frags.push({ f: 'because 뒤에 이유를 말해요', ok: false });
+    }
     const extras = line.extras.map(f => ({ f: fragLabel(f), ok: fragPass(a.text, f, 0.75) }));
     const n = frags.filter(x => x.ok).length;
-    if (!best || n > best.n) best = { text: a.text, frags, extras, n, pass: n === frags.length };
+    const pass = n === frags.length;
+    if (!best || (pass && !best.pass) || (pass === best.pass && n > best.n)) best = { text: a.text, frags, extras, n, pass };
   });
   return best;
 }
