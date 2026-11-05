@@ -275,6 +275,18 @@
   .selfbtn span { display: block; font-size: 44px; line-height: 1.2; }
   .selfbtn:hover { border-color: var(--primary); background: var(--primary-soft); }
 
+  /* 이유 문장 통과 조건 */
+  #reason { max-width: 100%; }
+  .rule { margin-top: 12px; padding: 12px 16px; border-radius: 10px; background: var(--green-soft); font-size: 16px; }
+  .rule-title { display: block; margin-bottom: 6px; }
+  .rule ul { margin: 0 0 8px; padding-left: 20px; }
+  .rule li { margin-bottom: 4px; }
+  .rule-words { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .rule-words span { padding: 2px 10px; border-radius: 8px; background: var(--card); font-weight: 700; }
+  .rule-ex { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 0; }
+  .rule-ex .mark { width: 24px; height: 24px; font-size: 14px; }
+  .rule-ex .ko { color: var(--muted); font-size: 14px; }
+
   /* ---------- 디자인 정리 ----------
    * 글꼴 하나(Pretendard)로 통일, 카드 테두리는 줄이고
    * 지금 할 일(내 차례 카드 · 말하기 버튼)만 강하게 보이게 한다. */
@@ -468,6 +480,17 @@
           <span class="sub" id="rpTry" style="margin:0"></span>
         </div>
         <div id="rpScaffold"></div>
+        <div class="rule" id="rpRule" hidden>
+          <b class="rule-title">이유 문장은 이렇게 말하면 통과예요</b>
+          <ul>
+            <li>아래 말 중 <b>하나</b>를 넣어요.
+              <span class="rule-words en"><span>I love</span><span>I like</span><span>I enjoy</span><span>because</span></span></li>
+            <li><b>4단어 이상</b>으로 말해요.</li>
+            <li><b class="en">It's because</b>는 빼도 되고, <b>내 이유로 바꿔</b> 말해도 돼요.</li>
+          </ul>
+          <p class="rule-ex en"><span class="mark ok">✓</span> I love it because it's fun.</p>
+          <p class="rule-ex en"><span class="mark no">↻</span> Fun. <span class="ko">← 너무 짧아서 다시 말해요</span></p>
+        </div>
         <button type="button" class="btn" id="rpPeek" style="margin-top:10px">문장 보기</button>
 
         <div id="rpSpeak">
@@ -535,12 +558,44 @@ const CATS = {
     emoji: '🌤️', label: 'Seasons', ko: '계절',
     pairs: [
       { id: 'winter_summer', items: [
-        it('winter', '겨울', ['winter activities like skiing', '스키 같은 겨울 활동'], ['winter activities like ice skating', '스케이트 같은 겨울 활동'], ['winter foods like hot soup', '따뜻한 국물 같은 겨울 음식']),
-        it('summer', '여름', ['summer activities like swimming', '수영 같은 여름 활동'], ['summer activities like camping', '캠핑 같은 여름 활동'], ['summer foods like ice cream', '아이스크림 같은 여름 음식']),
+        it('winter', '겨울',
+          ['winter activities like skiing', '스키 같은 겨울 활동'],
+          ['winter activities like ice skating', '스케이트 같은 겨울 활동'],
+          ['winter activities like sledding', '썰매 타기 같은 겨울 활동'],
+          ['winter foods like hot soup', '따뜻한 국물 같은 겨울 음식'],
+          ['winter drinks like hot chocolate', '핫초코 같은 겨울 음료'],
+          ['winter snacks like roasted sweet potatoes', '군고구마 같은 겨울 간식'],
+          ['winter events like Christmas', '크리스마스 같은 겨울 행사'],
+          ['winter clothes like warm coats', '따뜻한 코트 같은 겨울옷']),
+        it('summer', '여름',
+          ['summer activities like swimming', '수영 같은 여름 활동'],
+          ['summer activities like camping', '캠핑 같은 여름 활동'],
+          ['summer activities like surfing', '서핑 같은 여름 활동'],
+          ['summer foods like ice cream', '아이스크림 같은 여름 음식'],
+          ['summer fruits like watermelon', '수박 같은 여름 과일'],
+          ['summer clothes like T-shirts', '티셔츠 같은 여름옷'],
+          ['summer events like fireworks festivals', '불꽃 축제 같은 여름 행사'],
+          ['summer trips like beach trips', '바다 여행 같은 여름 여행']),
       ] },
       { id: 'spring_fall', items: [
-        it('spring', '봄', ['spring flowers like tulips', '튤립 같은 봄꽃'], ['spring activities like picnics', '소풍 같은 봄 활동'], ['spring fruits like strawberries', '딸기 같은 봄 과일']),
-        it('fall', '가을', ['fall activities like hiking', '등산 같은 가을 활동'], ['fall fruits like apples', '사과 같은 가을 과일'], ['fall colors like red and yellow', '빨강, 노랑 같은 가을 색']),
+        it('spring', '봄',
+          ['spring flowers like tulips', '튤립 같은 봄꽃'],
+          ['spring flowers like cherry blossoms', '벚꽃 같은 봄꽃'],
+          ['spring activities like picnics', '소풍 같은 봄 활동'],
+          ['spring activities like bike riding', '자전거 타기 같은 봄 활동'],
+          ['spring fruits like strawberries', '딸기 같은 봄 과일'],
+          ['spring events like school festivals', '학교 축제 같은 봄 행사'],
+          ['spring colors like pink and yellow', '분홍, 노랑 같은 봄 색'],
+          ['spring sports like baseball', '야구 같은 봄 운동']),
+        it('fall', '가을',
+          ['fall activities like hiking', '등산 같은 가을 활동'],
+          ['fall activities like camping', '캠핑 같은 가을 활동'],
+          ['fall fruits like apples', '사과 같은 가을 과일'],
+          ['fall fruits like persimmons', '감 같은 가을 과일'],
+          ['fall colors like red and yellow', '빨강, 노랑 같은 가을 색'],
+          ['fall foods like roasted chestnuts', '군밤 같은 가을 음식'],
+          ['fall events like sports day', '체육대회 같은 가을 행사'],
+          ['fall leaves like red maple leaves', '붉은 단풍잎 같은 가을 나뭇잎']),
       ] },
     ],
     partner: { pair: 0, pick: 0, reason: 'winter activities like skiing' },
@@ -549,12 +604,44 @@ const CATS = {
     emoji: '📐', label: 'Subjects', ko: '과목',
     pairs: [
       { id: 'math_english', items: [
-        it('math', '수학', ['math activities like puzzles', '퍼즐 같은 수학 활동'], ['math games like number games', '숫자 게임 같은 수학 게임']),
-        it('English', '영어', ['English activities like singing songs', '노래 부르기 같은 영어 활동'], ['English activities like role-plays', '역할극 같은 영어 활동'], ['English books like Harry Potter', '해리 포터 같은 영어 책']),
+        it('math', '수학',
+          ['math activities like puzzles', '퍼즐 같은 수학 활동'],
+          ['math activities like solving problems', '문제 풀이 같은 수학 활동'],
+          ['math games like number games', '숫자 게임 같은 수학 게임'],
+          ['math games like sudoku', '스도쿠 같은 수학 게임'],
+          ['math tools like calculators', '계산기 같은 수학 도구'],
+          ['math shapes like circles and triangles', '원, 삼각형 같은 수학 도형'],
+          ['math topics like geometry', '도형 같은 수학 주제'],
+          ['math topics like fractions', '분수 같은 수학 주제']),
+        it('English', '영어',
+          ['English activities like singing songs', '노래 부르기 같은 영어 활동'],
+          ['English activities like role-plays', '역할극 같은 영어 활동'],
+          ['English activities like word games', '단어 게임 같은 영어 활동'],
+          ['English activities like reading stories', '이야기 읽기 같은 영어 활동'],
+          ['English books like Harry Potter', '해리 포터 같은 영어 책'],
+          ['English movies like Frozen', '겨울왕국 같은 영어 영화'],
+          ['English songs like pop songs', '팝송 같은 영어 노래'],
+          ['English shows like cartoons', '만화 같은 영어 프로그램']),
       ] },
       { id: 'music_art', items: [
-        it('music', '음악', ['music activities like singing', '노래 부르기 같은 음악 활동'], ['music activities like playing the guitar', '기타 연주 같은 음악 활동']),
-        it('art', '미술', ['art activities like drawing', '그리기 같은 미술 활동'], ['art activities like painting', '색칠하기 같은 미술 활동']),
+        it('music', '음악',
+          ['music activities like singing', '노래 부르기 같은 음악 활동'],
+          ['music activities like playing the guitar', '기타 연주 같은 음악 활동'],
+          ['music activities like playing the piano', '피아노 연주 같은 음악 활동'],
+          ['music activities like playing the drums', '드럼 연주 같은 음악 활동'],
+          ['music activities like listening to songs', '노래 듣기 같은 음악 활동'],
+          ['music styles like K-pop', '케이팝 같은 음악 장르'],
+          ['music styles like hip-hop', '힙합 같은 음악 장르'],
+          ['musical instruments like the violin', '바이올린 같은 악기']),
+        it('art', '미술',
+          ['art activities like drawing', '그리기 같은 미술 활동'],
+          ['art activities like painting', '색칠하기 같은 미술 활동'],
+          ['art activities like making posters', '포스터 만들기 같은 미술 활동'],
+          ['art activities like making clay models', '점토 만들기 같은 미술 활동'],
+          ['art activities like taking photos', '사진 찍기 같은 미술 활동'],
+          ['art styles like cartoons', '만화 같은 미술 양식'],
+          ['art tools like colored pencils', '색연필 같은 미술 도구'],
+          ['art crafts like origami', '종이접기 같은 미술 공예']),
       ] },
     ],
     partner: { pair: 0, pick: 1, reason: 'English activities like singing songs' },
@@ -563,12 +650,44 @@ const CATS = {
     emoji: '🍽️', label: 'Food', ko: '음식',
     pairs: [
       { id: 'pizza_chicken', items: [
-        it('pizza', '피자', ['cheesy foods like pizza', '피자 같은 치즈 음식'], ['Italian foods like pizza', '피자 같은 이탈리아 음식']),
-        it('chicken', '치킨', ['crispy foods like fried chicken', '프라이드치킨 같은 바삭한 음식'], ['spicy foods like spicy chicken', '매운 치킨 같은 매운 음식']),
+        it('pizza', '피자',
+          ['cheesy foods like pizza', '피자 같은 치즈 음식'],
+          ['Italian foods like pizza', '피자 같은 이탈리아 음식'],
+          ['party foods like pizza', '피자 같은 파티 음식'],
+          ['fast foods like pizza', '피자 같은 패스트푸드'],
+          ['pizza toppings like pepperoni', '페퍼로니 같은 피자 토핑'],
+          ['pizza toppings like mushrooms', '버섯 같은 피자 토핑'],
+          ['pizza toppings like sweet corn', '옥수수 같은 피자 토핑'],
+          ['pizza crusts like cheese crust', '치즈 크러스트 같은 피자 도우']),
+        it('chicken', '치킨',
+          ['crispy foods like fried chicken', '프라이드치킨 같은 바삭한 음식'],
+          ['spicy foods like spicy chicken', '매운 치킨 같은 매운 음식'],
+          ['sweet foods like honey chicken', '허니 치킨 같은 달콤한 음식'],
+          ['savory foods like soy sauce chicken', '간장 치킨 같은 짭짤한 음식'],
+          ['fried foods like fried chicken', '프라이드치킨 같은 튀김 음식'],
+          ['party foods like chicken wings', '닭 날개 같은 파티 음식'],
+          ['chicken dishes like dakgalbi', '닭갈비 같은 닭 요리'],
+          ['chicken dishes like samgyetang', '삼계탕 같은 닭 요리']),
       ] },
       { id: 'rice_noodles', items: [
-        it('rice', '밥', ['Korean foods like bibimbap', '비빔밥 같은 한국 음식'], ['healthy foods like rice balls', '주먹밥 같은 건강한 음식']),
-        it('noodles', '면', ['warm foods like ramen', '라면 같은 따뜻한 음식'], ['chewy foods like udon', '우동 같은 쫄깃한 음식']),
+        it('rice', '밥',
+          ['Korean foods like bibimbap', '비빔밥 같은 한국 음식'],
+          ['healthy foods like rice balls', '주먹밥 같은 건강한 음식'],
+          ['rice dishes like fried rice', '볶음밥 같은 밥 요리'],
+          ['rice dishes like kimbap', '김밥 같은 밥 요리'],
+          ['rice dishes like curry rice', '카레라이스 같은 밥 요리'],
+          ['filling foods like rice bowls', '덮밥 같은 든든한 음식'],
+          ['warm foods like steamed rice', '갓 지은 밥 같은 따뜻한 음식'],
+          ['rice snacks like rice cakes', '떡 같은 쌀 간식']),
+        it('noodles', '면',
+          ['warm foods like ramen', '라면 같은 따뜻한 음식'],
+          ['chewy foods like udon', '우동 같은 쫄깃한 음식'],
+          ['cold foods like cold noodles', '냉면 같은 차가운 음식'],
+          ['spicy foods like spicy ramen', '매운 라면 같은 매운 음식'],
+          ['Italian foods like spaghetti', '스파게티 같은 이탈리아 음식'],
+          ['Korean foods like japchae', '잡채 같은 한국 음식'],
+          ['Chinese foods like jajangmyeon', '짜장면 같은 중국 음식'],
+          ['soupy foods like kalguksu', '칼국수 같은 국물 음식']),
       ] },
     ],
     partner: { pair: 0, pick: 0, reason: 'cheesy foods like pizza' },
@@ -1554,7 +1673,7 @@ function buildRole(key, role) {
     { id: 'A2', me: false, text: whyLine(r.item) },
     { id: 'B2', me: true, free: true, text: reasonLine(r.reason),
       tpl: `It's because I [love] ${r.reason.replace(' like ', ' [like] ')}.`,
-      ko: `더 좋아하는 이유를 말하세요. (${r.reasonKo}) 내 이유로 바꿔 말해도 돼요.`,
+      ko: `더 좋아하는 이유를 말하세요. (${r.reasonKo})`,
       frags: [['i love', 'i like', 'i enjoy', 'because']], extras: [] },
   ];
 }
@@ -1716,6 +1835,7 @@ function renderLine() {
   // 끝난 대사는 아래 결과 칸에 바른 문장을 보여 주므로 위쪽 문장은 숨김
   $('#rpScaffold').hidden = done;
   $('#rpScaffold').innerHTML = done ? '' : scaffoldHTML(line, rec.level, rec.peeked);
+  $('#rpRule').hidden = done || !line.free;
   $('#rpPeek').hidden = done || rec.level === 1 || rec.peeked;
   $('#rpSpeak').hidden = done;
   $('#rpMicBtn').hidden = Mic.ready;
