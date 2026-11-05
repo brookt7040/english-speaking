@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>추천 요청 롤플레이</title>
+<title>선호 묻기 롤플레이</title>
 <link rel="icon" href="icons/favicon.ico" sizes="any">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -162,46 +162,7 @@
   .start-area { text-align: center; margin-top: 8px; }
   .start-area .msg { text-align: left; }
 
-  /* ---------- 화면 5 ---------- */
-  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-  .steps > li {
-    display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px;
-    border: 1.5px solid var(--line); border-radius: 12px; background: var(--card);
-  }
-  .steps > li.done { border-color: var(--green); background: var(--green-soft); }
-  .steps .num {
-    flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
-    background: var(--primary-soft); color: var(--primary); font-weight: 800;
-  }
-  .steps > li.done .num { background: var(--green); color: var(--ink); }
-  .steps .body { flex: 1; min-width: 0; }
-  .steps .body b.t { display: block; font-size: 17px; }
-  .steps .body .sub { margin-top: 4px; }
-  .steps .body > .btn { margin-top: 8px; text-decoration: none; }
-  .steps .check {
-    flex: none; display: flex; align-items: center; gap: 6px; cursor: pointer;
-    font-size: 14px; font-weight: 600; color: var(--muted); white-space: nowrap; padding-top: 4px;
-  }
-  .steps .check input { width: 20px; height: 20px; accent-color: var(--green); margin: 0; }
-  .howto { list-style: decimal; margin: 4px 0 0; padding-left: 22px; display: flex; flex-direction: column; gap: 4px; color: var(--ink); }
-  .howto kbd { font-size: 13px; }
-  .copy-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
-  .copy-row code {
-    padding: 8px 12px; border-radius: 8px; background: var(--soft); font-size: 17px; font-weight: 700;
-    font-family: inherit; word-break: break-all;
-  }
   .nav-row { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin-top: 16px; }
-  .done-box { text-align: center; padding: 26px 20px; }
-
-  /* 개인정보 처리방침 안내 (화면 1 · 5) */
-  .privacy-box {
-    margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); text-align: center;
-  }
-  .privacy-box p { margin: 0 0 10px; font-size: 15px; color: var(--muted); }
-  .privacy-box .btn { font-size: 15px; padding: 8px 14px; text-decoration: none; }
-  .privacy-link { margin: 24px 0 0; text-align: center; font-size: 13px; }
-  .privacy-link a { color: var(--muted); }
-  .done-box .big-emoji { font-size: 56px; line-height: 1.2; }
 
   /* ---------- 화면 2 ---------- */
   .tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -373,11 +334,6 @@
   .ptt:disabled { background: var(--line); color: var(--muted); box-shadow: none; }
   .meter i { background: var(--speak); }
 
-  .done-mark {
-    width: 64px; height: 64px; margin: 0 auto 8px; border-radius: 50%; border: 2.5px solid var(--ink);
-    display: grid; place-items: center; background: var(--green); color: var(--ink);
-    font-size: 34px; font-weight: 800;
-  }
   .btn:focus-visible, .ptt:focus-visible, .tab:focus-visible, .selfbtn:focus-visible {
     outline: 3px solid var(--ink); outline-offset: 2px;
   }
@@ -392,7 +348,7 @@
 <body>
 
 <header class="topbar">
-  <span class="title">추천 요청 롤플레이</span>
+  <span class="title">선호 묻기 롤플레이</span>
   <span class="badge" id="classBadge" hidden></span>
   <span class="badge" id="studentBadge" hidden></span>
   <span class="spacer"></span>
@@ -467,16 +423,12 @@
       <button type="button" class="btn primary big" id="startBtn" style="margin-top:12px">시작하기 ▶</button>
     </div>
 
-    <div class="privacy-box">
-      <p>이름은 받지 않습니다. 연습 기록은 이 기기에만 저장됩니다.</p>
-      <a class="btn" href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a>
-    </div>
   </section>
 
   <!-- ======================= 화면 2: 종류 고르기 ======================= -->
   <section class="screen" data-screen="2" hidden>
-    <h1>무엇을 추천할지 정해요</h1>
-    <p class="lead">종류를 고르고, 친구에게 추천할 것과 그 이유(형용사)를 정해요.</p>
+    <h1>무엇을 더 좋아하는지 정해요</h1>
+    <p class="lead">주제마다 둘 중 더 좋아하는 것과 그 이유를 정해요.</p>
 
     <div class="tabs" id="tabs"></div>
     <div id="panel"></div>
@@ -540,7 +492,7 @@
   <!-- ======================= 화면 4: 결과 카드 ======================= -->
   <section class="screen" data-screen="4" hidden>
     <h1>모두 끝났어요!</h1>
-    <p class="lead">결과 카드를 이미지로 저장해서 패들렛에 올려요.</p>
+    <p class="lead">결과 카드를 이미지로 저장해요.</p>
     <div class="card" style="padding:12px">
       <canvas id="cardCanvas" class="result-card" aria-label="롤플레이 결과 카드"></canvas>
     </div>
@@ -549,31 +501,11 @@
       <p class="sub" id="cardFile"></p>
       <div id="saveMsg" hidden></div>
     </div>
-    <div class="nav-row" style="justify-content:flex-end">
-      <button type="button" class="btn primary big" id="toSubmit">다음: 패들렛에 올리기 ▶</button>
-    </div>
-  </section>
-
-  <!-- ======================= 화면 5: 패들렛 제출 ======================= -->
-  <section class="screen" data-screen="5" hidden>
-    <h1>패들렛에 올려요</h1>
-    <p class="lead">한 단계씩 따라 하고, 끝낸 단계에는 <b>했어요</b>에 체크해요.</p>
-    <div id="padletMissing" hidden></div>
-    <div class="card">
-      <ol class="steps" id="submitSteps"></ol>
-    </div>
     <div class="start-area">
-      <button type="button" class="btn primary big" id="submitDone" disabled>제출 완료</button>
-      <p class="sub" id="submitLeft"></p>
+      <div id="finishMsg" hidden></div>
+      <button type="button" class="btn big" id="finishBtn" style="margin-top:12px">끝내기 ✓</button>
+      <p class="sub">끝내면 이 기기의 연습 기록이 지워져서 다음 학생이 처음부터 시작할 수 있어요.</p>
     </div>
-    <div class="card done-box" id="submitFinish" hidden>
-      <div class="done-mark" aria-hidden="true">✓</div>
-      <h2 style="justify-content:center">제출 완료!</h2>
-    </div>
-    <div class="nav-row">
-      <button type="button" class="btn" id="backToCard">◀ 결과 카드로 돌아가기</button>
-    </div>
-    <p class="privacy-link"><a href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></p>
   </section>
 </main>
 
@@ -584,156 +516,72 @@
 /* =========================================================
  * 설정 · 내용
  * ========================================================= */
-const STORE_KEY = 'roleplay_recommend_v1';
+const STORE_KEY = 'roleplay_prefer_v1';
 const STALE_MS = 60 * 60 * 1000; // 이보다 오래된 진행 기록은 이어 하지 않음
 
 const params = new URLSearchParams(location.search);
 const CLASS_NAME = (params.get('class') || '').trim();
 const CAT_COUNT = params.get('cat') === '2' ? 2 : 3;
 
+const it = (en, ko, ...reasons) => ({ en, ko, reasons: reasons.map(([r, k]) => ({ en: r, ko: k })) });
 /*
- * 제출할 패들렛 주소. 다른 반은 링크 뒤에 &padlet=주소 를 붙이면 바뀐다.
- * (padlet.com 주소만 받음)
- */
-const PADLET_DEFAULT = 'https://padlet.com/insuenglish/2-a-6-role-play-s0241xw19s0rvbnew7me';
-const PADLET_URL = (() => {
-  const u = (params.get('padlet') || PADLET_DEFAULT).trim();
-  return /^https:\/\/([a-z0-9-]+\.)*padlet\.(com|org)\//i.test(u) ? u : '';
-})();
-
-/*
- * 종류(장르)마다 그 장르에 맞는 작품·음식만 고를 수 있게 한다.
- *  - items: 기본 항목 2개 / others: '다른 종류' 드롭다운 항목
- *  - titles: 추천 드롭다운 목록. 문자열 또는 { en, ko, adjs }
- *      ko  : 드롭다운에 괄호로 보여 줄 한국어 이름
- *      adjs: 그 음식의 특징에 맞는 형용사 (고르면 형용사 드롭다운 맨 위에 보여 줌)
- *  - adjs(장르): 그 장르에 잘 어울리는 형용사
- *  - adjs(카테고리): 그 카테고리에서 고를 수 있는 형용사 전체 [영어, 뜻]
- *  - 음식 이름은 "It's really ~" 와 어울리도록 셀 수 없는 이름으로 적는다.
+ * 주제마다 비교할 짝(pairs)이 있고, 짝의 두 항목마다 이유(reasons)가 있다.
+ *  - 이유는 "I love ___ like ___." 뒤에 들어갈 말. It's because 는 말하지 않아도 된다.
+ *  - partner: 학생이 A 역할일 때 친구가 고정으로 답하는 내용.
+ *  - 짝이나 항목을 바꾸면 audio/ 파일 이름도 같이 바뀐다.
  */
 const CATS = {
-  movies: {
-    emoji: '🎬', label: 'Movies', ko: '영화',
-    ask: '어떤 종류의 영화를 좋아하나요?',
-    hintA1: '친구에게 어떤 종류의 영화를 좋아하는지 물어보세요.',
-    useSome: false,
-    recAsk: '친구에게 추천할 영화',
-    items: [
-      { id: 'action', plural: 'action movies', single: 'an action movie', ko: '액션 영화',
-        titles: ['Spider-Man', 'The Avengers', 'Top Gun', 'Mission: Impossible'],
-        adjs: ['exciting', 'thrilling', 'cool', 'amazing'] },
-      { id: 'musical', plural: 'musical movies', single: 'a musical movie', ko: '뮤지컬 영화',
-        titles: ['Frozen', 'The Greatest Showman', 'Mamma Mia!', 'Aladdin'],
-        adjs: ['touching', 'beautiful', 'fun', 'amazing'] },
+  seasons: {
+    emoji: '🌤️', label: 'Seasons', ko: '계절',
+    pairs: [
+      { id: 'winter_summer', items: [
+        it('winter', '겨울', ['winter activities like skiing', '스키 같은 겨울 활동'], ['winter activities like ice skating', '스케이트 같은 겨울 활동'], ['winter foods like hot soup', '따뜻한 국물 같은 겨울 음식']),
+        it('summer', '여름', ['summer activities like swimming', '수영 같은 여름 활동'], ['summer activities like camping', '캠핑 같은 여름 활동'], ['summer foods like ice cream', '아이스크림 같은 여름 음식']),
+      ] },
+      { id: 'spring_fall', items: [
+        it('spring', '봄', ['spring flowers like tulips', '튤립 같은 봄꽃'], ['spring activities like picnics', '소풍 같은 봄 활동'], ['spring fruits like strawberries', '딸기 같은 봄 과일']),
+        it('fall', '가을', ['fall activities like hiking', '등산 같은 가을 활동'], ['fall fruits like apples', '사과 같은 가을 과일'], ['fall colors like red and yellow', '빨강, 노랑 같은 가을 색']),
+      ] },
     ],
-    others: [
-      { id: 'animated', plural: 'animated movies', single: 'an animated movie', ko: '애니메이션 영화',
-        titles: ['Coco', 'Moana'],
-        adjs: ['touching', 'heartwarming', 'beautiful', 'funny'] },
-      { id: 'scifi', plural: 'sci-fi movies', single: 'a sci-fi movie', ko: 'SF 영화',
-        titles: ['E.T.', 'Star Wars'],
-        adjs: ['amazing', 'exciting', 'cool', 'fantastic'] },
-    ],
-    adjs: [
-      ['exciting', '신나는'], ['thrilling', '짜릿한'], ['cool', '멋진'], ['amazing', '놀라운'],
-      ['fantastic', '환상적인'], ['funny', '웃긴'], ['fun', '재미있는'], ['touching', '감동적인'],
-      ['heartwarming', '마음이 따뜻해지는'], ['beautiful', '아름다운'], ['interesting', '흥미로운'],
-      ['sad', '슬픈'],
-    ],
-    partner: { kind: 'musical movies', rec: 'Frozen', adj: 'touching' },
+    partner: { pair: 0, pick: 0, reason: 'winter activities like skiing' },
   },
-  books: {
-    emoji: '📚', label: 'Books', ko: '책',
-    ask: '어떤 종류의 책을 좋아하나요?',
-    hintA1: '친구에게 어떤 종류의 책을 좋아하는지 물어보세요.',
-    useSome: false,
-    recAsk: '친구에게 추천할 책',
-    items: [
-      { id: 'fantasy', plural: 'fantasy novels', single: 'a fantasy novel', ko: '판타지 소설',
-        titles: ['Harry Potter', 'The Hobbit', 'Percy Jackson'],
-        adjs: ['fantastic', 'exciting', 'amazing', 'creative'] },
-      { id: 'adventure', plural: 'adventure novels', single: 'an adventure novel', ko: '모험 소설',
-        titles: ['Treasure Island', 'Robinson Crusoe', 'Around the World in 80 Days'],
-        adjs: ['exciting', 'thrilling', 'interesting', 'fun'] },
+  subjects: {
+    emoji: '📐', label: 'Subjects', ko: '과목',
+    pairs: [
+      { id: 'math_english', items: [
+        it('math', '수학', ['math activities like puzzles', '퍼즐 같은 수학 활동'], ['math games like number games', '숫자 게임 같은 수학 게임']),
+        it('English', '영어', ['English activities like singing songs', '노래 부르기 같은 영어 활동'], ['English activities like role-plays', '역할극 같은 영어 활동'], ['English books like Harry Potter', '해리 포터 같은 영어 책']),
+      ] },
+      { id: 'music_art', items: [
+        it('music', '음악', ['music activities like singing', '노래 부르기 같은 음악 활동'], ['music activities like playing the guitar', '기타 연주 같은 음악 활동']),
+        it('art', '미술', ['art activities like drawing', '그리기 같은 미술 활동'], ['art activities like painting', '색칠하기 같은 미술 활동']),
+      ] },
     ],
-    others: [
-      { id: 'growing', plural: 'coming-of-age novels', single: 'a coming-of-age novel', ko: '성장 소설',
-        titles: ['Holes', 'Wonder'],
-        adjs: ['touching', 'heartwarming', 'moving', 'meaningful'] },
-      { id: 'mystery', plural: 'mystery novels', single: 'a mystery novel', ko: '추리 소설',
-        titles: ['Sherlock Holmes', 'The Westing Game'],
-        adjs: ['mysterious', 'thrilling', 'interesting', 'clever'] },
-    ],
-    adjs: [
-      ['exciting', '신나는'], ['thrilling', '짜릿한'], ['interesting', '흥미로운'], ['fun', '재미있는'],
-      ['fantastic', '환상적인'], ['amazing', '놀라운'], ['creative', '창의적인'], ['mysterious', '신비로운'],
-      ['clever', '기발한'], ['touching', '감동적인'], ['moving', '마음을 울리는'],
-      ['heartwarming', '마음이 따뜻해지는'], ['meaningful', '의미 있는'], ['funny', '웃긴'],
-    ],
-    partner: { kind: 'adventure novels', rec: 'Treasure Island', adj: 'exciting' },
+    partner: { pair: 0, pick: 1, reason: 'English activities like singing songs' },
   },
   food: {
     emoji: '🍽️', label: 'Food', ko: '음식',
-    ask: '어떤 종류의 음식을 좋아하나요?',
-    hintA1: '친구에게 어떤 종류의 음식을 좋아하는지 물어보세요.',
-    useSome: true,
-    recAsk: '친구에게 추천할 음식',
-    items: [
-      { id: 'korean', plural: 'Korean food', ko: '한식',
-        titles: [
-          { en: 'bibimbap', ko: '비빔밥', adjs: ['healthy', 'colorful', 'delicious'] },
-          { en: 'bulgogi', ko: '불고기', adjs: ['sweet', 'savory', 'juicy'] },
-          { en: 'tteokbokki', ko: '떡볶이', adjs: ['spicy', 'chewy', 'sweet'] },
-          { en: 'japchae', ko: '잡채', adjs: ['chewy', 'savory', 'colorful'] },
-          { en: 'kimchi stew', ko: '김치찌개', adjs: ['spicy', 'warm', 'sour'] },
-        ],
-        adjs: ['delicious', 'spicy', 'healthy', 'savory'] },
-      { id: 'italian', plural: 'Italian food', ko: '이탈리아 음식',
-        titles: [
-          { en: 'pizza', ko: '피자', adjs: ['cheesy', 'crispy', 'delicious'] },
-          { en: 'pasta', ko: '파스타', adjs: ['creamy', 'delicious', 'savory'] },
-          { en: 'lasagna', ko: '라자냐', adjs: ['cheesy', 'warm', 'savory'] },
-          { en: 'risotto', ko: '리소토', adjs: ['creamy', 'soft', 'savory'] },
-        ],
-        adjs: ['delicious', 'cheesy', 'creamy', 'savory'] },
+    pairs: [
+      { id: 'pizza_chicken', items: [
+        it('pizza', '피자', ['cheesy foods like pizza', '피자 같은 치즈 음식'], ['Italian foods like pizza', '피자 같은 이탈리아 음식']),
+        it('chicken', '치킨', ['crispy foods like fried chicken', '프라이드치킨 같은 바삭한 음식'], ['spicy foods like spicy chicken', '매운 치킨 같은 매운 음식']),
+      ] },
+      { id: 'rice_noodles', items: [
+        it('rice', '밥', ['Korean foods like bibimbap', '비빔밥 같은 한국 음식'], ['healthy foods like rice balls', '주먹밥 같은 건강한 음식']),
+        it('noodles', '면', ['warm foods like ramen', '라면 같은 따뜻한 음식'], ['chewy foods like udon', '우동 같은 쫄깃한 음식']),
+      ] },
     ],
-    others: [
-      { id: 'japanese', plural: 'Japanese food', ko: '일식',
-        titles: [
-          { en: 'sushi', ko: '초밥', adjs: ['fresh', 'healthy', 'delicious'] },
-          { en: 'ramen', ko: '라멘', adjs: ['warm', 'savory', 'salty'] },
-          { en: 'udon', ko: '우동', adjs: ['chewy', 'warm', 'soft'] },
-          { en: 'tempura', ko: '튀김', adjs: ['crispy', 'delicious', 'light'] },
-        ],
-        adjs: ['fresh', 'healthy', 'delicious', 'warm'] },
-      { id: 'chinese', plural: 'Chinese food', ko: '중식',
-        titles: [
-          { en: 'fried rice', ko: '볶음밥', adjs: ['savory', 'delicious', 'filling'] },
-          { en: 'mapo tofu', ko: '마파두부', adjs: ['spicy', 'soft', 'savory'] },
-          { en: 'sweet and sour pork', ko: '탕수육', adjs: ['crispy', 'sweet', 'sour'] },
-          { en: 'dim sum', ko: '딤섬', adjs: ['juicy', 'soft', 'delicious'] },
-        ],
-        adjs: ['delicious', 'crispy', 'spicy', 'savory'] },
-    ],
-    adjs: [
-      ['delicious', '맛있는'], ['spicy', '매운'], ['sweet', '달콤한'], ['sour', '새콤한'],
-      ['salty', '짭짤한'], ['savory', '감칠맛 나는'], ['crispy', '바삭한'], ['chewy', '쫄깃한'],
-      ['soft', '부드러운'], ['creamy', '크림처럼 부드러운'], ['cheesy', '치즈가 듬뿍 든'],
-      ['juicy', '육즙이 가득한'], ['fresh', '신선한'], ['healthy', '건강에 좋은'], ['warm', '따뜻한'],
-      ['light', '담백한'], ['filling', '든든한'], ['colorful', '알록달록한'],
-    ],
-    partner: { kind: 'Italian food', rec: 'pasta', adj: 'delicious' },
+    partner: { pair: 0, pick: 0, reason: 'cheesy foods like pizza' },
   },
 };
-/** 추천 목록 항목을 { en, ko, adjs } 모양으로 맞춤 */
-const titlesOf = g => (g ? g.titles : []).map(t => (typeof t === 'string' ? { en: t } : t));
-const CAT_KEYS = ['movies', 'books', 'food'].slice(0, CAT_COUNT);
+const MORE = ['more', 'better']; // 둘 다 인정
+const CAT_KEYS = ['seasons', 'subjects', 'food'].slice(0, CAT_COUNT);
 
 /* =========================================================
  * 저장 (localStorage)
  * ========================================================= */
 function emptyChoice() {
-  return { pick: null, ownGenre: '', rec: '', adj: '' };
+  return { pair: null, pick: null, reason: '' };
 }
 function defaultState() {
   const choices = {};
@@ -748,7 +596,7 @@ function defaultState() {
     choices,
     startedAt: null,
     rp: null, // 롤플레이 진행 상황 (화면 3)
-    submit: { saved: false, checks: {}, done: false }, // 결과 카드 저장 · 패들렛 제출 (화면 4-5)
+    cardSaved: false,
   };
 }
 function loadState() {
@@ -756,10 +604,10 @@ function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
     if (!saved) return base;
-    // 제출까지 끝냈거나 시작한 지 1시간이 지난 기록은 다른 학생(다음 반)이 쓰는 것으로 보고
+    // 시작한 지 1시간이 지난 기록은 다른 학생(다음 반)이 쓰는 것으로 보고
     // 소리 설정만 살려 처음부터
     const stale = saved.startedAt && Date.now() - saved.startedAt > STALE_MS;
-    if ((saved.submit && saved.submit.done) || stale) {
+    if (stale) {
       Object.assign(base.settings, saved.settings);
       return base;
     }
@@ -776,11 +624,7 @@ function loadState() {
     base.startedAt = saved.startedAt || null;
     // 라운드 순서가 바뀌기 전(A→B)의 진행 기록은 버리고 롤플레이를 처음부터
     if (saved.rp && saved.rp.order === 'BA' && saved.rp.ci < CAT_KEYS.length) base.rp = saved.rp;
-    if (saved.submit) {
-      base.submit.saved = !!saved.submit.saved;
-      base.submit.done = !!saved.submit.done;
-      Object.assign(base.submit.checks, saved.submit.checks);
-    }
+    base.cardSaved = !!saved.cardSaved;
   } catch (e) { /* 저장된 값이 깨졌으면 새로 시작 */ }
   return base;
 }
@@ -863,6 +707,9 @@ function fragmentScore(text, fragment) {
   return best;
 }
 const PASS_SCORE = 0.8;
+/** 조각이 목록이면 그중 하나만 맞아도 인정 (예: more / better) */
+const fragLabel = f => [].concat(f).join(' / ');
+const fragPass = (text, f, min) => [].concat(f).some(x => fragmentScore(text, x) >= min);
 
 /* =========================================================
  * 환경 확인 · 안내 배너
@@ -890,23 +737,26 @@ window.addEventListener('online', () => { renderBanners(); PTT.refreshAll(); });
 window.addEventListener('offline', () => { renderBanners(); PTT.refreshAll(); });
 
 /* =========================================================
- * 녹음한 음성 파일 (친구 대사 21개)
+ * 녹음한 음성 파일 (친구 대사 24개)
  * 문장이 같으면 TTS 대신 audio/ 파일을 튼다. 파일이 없는 문장(학생 B2 등)은 TTS.
- *  - {종류}_a1 / {종류}_a2_{장르 id} / {종류}_b1 / {종류}_b2 (b1·b2는 친구 취향)
+ *  - {주제}_a1_{짝 id} / {주제}_a2_{항목} / {주제}_b1 / {주제}_b2 (b1·b2는 친구 취향)
  * ========================================================= */
 const AUDIO_DIR = 'audio/';
+const askLine = pr => `Which do you like more, ${pr.items[0].en} or ${pr.items[1].en}?`;
+const whyLine = x => `Why do you like ${x} more?`;
+const reasonLine = r => `It's because I love ${r}.`;
 let audioMap = null;
 function audioFile(text) {
   if (!audioMap) {
     audioMap = new Map();
     Object.keys(CATS).forEach(key => {
-      const cat = CATS[key], p = cat.partner;
-      audioMap.set(`What kinds of ${key} do you like?`, `${key}_a1.mp3`);
-      [...cat.items, ...cat.others].forEach(g => audioMap.set(
-        cat.useSome ? `Can you recommend some ${g.plural} for me?` : `Can you recommend ${g.single} for me?`,
-        `${key}_a2_${g.id}.mp3`));
-      audioMap.set(`I like ${p.kind}.`, `${key}_b1.mp3`);
-      audioMap.set(`Sure. I recommend ${p.rec}. It's really ${p.adj}.`, `${key}_b2.mp3`);
+      const cat = CATS[key], p = partnerOf(key);
+      cat.pairs.forEach(pr => {
+        audioMap.set(askLine(pr), `${key}_a1_${pr.id}.mp3`);
+        pr.items.forEach(i => audioMap.set(whyLine(i.en), `${key}_a2_${i.en.toLowerCase()}.mp3`));
+      });
+      audioMap.set(`I like ${p.item} more.`, `${key}_b1.mp3`);
+      audioMap.set(reasonLine(p.reason), `${key}_b2.mp3`);
     });
   }
   const f = audioMap.get(text);
@@ -1339,7 +1189,6 @@ function go(n) {
     renderRp();
   }
   if (n === 4) renderScreen4();
-  if (n === 5) renderScreen5();
   window.scrollTo(0, 0);
 }
 
@@ -1491,44 +1340,38 @@ $('#startBtn').addEventListener('click', () => {
  * 화면 2 — 종류 고르기 & 입력
  * ========================================================= */
 
-/** 지금 고른 종류(장르) 객체 — 기본 2개 또는 '다른 종류' 드롭다운 */
-function genreOf(key) {
-  const cat = CATS[key], c = state.choices[key];
-  if (c.pick === 'own') return cat.others.find(g => g.id === c.ownGenre) || null;
-  return c.pick == null ? null : cat.items[c.pick] || null;
-}
+const pairOf = key => { const c = state.choices[key]; return c.pair == null ? null : CATS[key].pairs[c.pair] || null; };
+const itemOf = key => { const c = state.choices[key], p = pairOf(key); return p && c.pick != null ? p.items[c.pick] || null : null; };
 
 /** 선택 결과 → 문장에 들어갈 값 */
 function resolved(key) {
-  const g = genreOf(key), c = state.choices[key];
-  return { kind: g ? g.plural : '', single: g && g.single ? g.single : '', rec: c.rec, adj: c.adj };
+  const p = pairOf(key), i = itemOf(key), c = state.choices[key];
+  const rs = i && i.reasons.find(x => x.en === c.reason);
+  return { pair: p, item: i ? i.en : '', itemKo: i ? i.ko : '', reason: rs ? rs.en : '', reasonKo: rs ? rs.ko : '' };
 }
 
-/** 저장된 값이 현재 목록에 없으면 비움 (장르를 바꿨거나 목록이 바뀐 경우) */
+/** 저장된 값이 현재 목록에 없으면 비움 */
 function sanitizeChoice(key) {
-  const cat = CATS[key], c = state.choices[key], g = genreOf(key);
-  if (c.pick === 'own' && !g) c.ownGenre = '';
-  if (!titlesOf(g).some(t => t.en === c.rec)) c.rec = '';
-  if (!cat.adjs.some(([a]) => a === c.adj)) c.adj = '';
+  const c = state.choices[key];
+  if (!pairOf(key)) { c.pair = null; c.pick = null; }
+  const i = itemOf(key);
+  if (!i) c.pick = null;
+  if (!i || !i.reasons.some(x => x.en === c.reason)) c.reason = '';
 }
 
 function validate(key) {
-  const cat = CATS[key], c = state.choices[key];
-  const miss = [];
-  if (c.pick == null) miss.push('좋아하는 종류를 골라 주세요.');
-  else if (c.pick === 'own' && !genreOf(key)) miss.push('다른 종류 목록에서 하나를 골라 주세요.');
-  if (!c.rec) miss.push('2번에서 추천할 것을 골라 주세요.');
-  if (!c.adj) miss.push('어떤 점이 좋은지(형용사) 골라 주세요.');
+  const c = state.choices[key], miss = [];
+  if (c.pair == null) miss.push('1번에서 비교할 두 가지를 골라 주세요.');
+  if (c.pick == null) miss.push('2번에서 더 좋아하는 것을 골라 주세요.');
+  if (!c.reason) miss.push('3번에서 이유를 골라 주세요.');
   return miss;
 }
 
 function renderStep() {
   const key = CAT_KEYS[state.step];
   const cat = CATS[key];
-  const c = state.choices[key];
   sanitizeChoice(key);
 
-  // 탭
   const tabs = $('#tabs');
   tabs.innerHTML = '';
   CAT_KEYS.forEach((k, i) => {
@@ -1541,141 +1384,86 @@ function renderStep() {
     tabs.append(b);
   });
 
-  const items = cat.items.map((g, i) => `
-    <label class="opt"><input type="radio" name="pick" value="${i}">
-      <span><span class="en">${g.plural}</span><small>${g.ko}</small></span>
+  const pairs = cat.pairs.map((p, i) => `
+    <label class="opt"><input type="radio" name="pair" value="${i}">
+      <span><span class="en">${esc(p.items[0].en)} or ${esc(p.items[1].en)}</span><small>${esc(p.items[0].ko)} / ${esc(p.items[1].ko)}</small></span>
     </label>`).join('');
 
   $('#panel').innerHTML = `
     <div class="card">
       <h2>${cat.emoji} ${cat.label} <small>${cat.ko}</small></h2>
-
       <div class="q">
-        <div class="q-title"><span class="num">1</span> ${cat.ask}</div>
-        <div class="opts">
-          ${items}
-          <label class="opt"><input type="radio" name="pick" value="own">
-            <span>다른 종류<small class="en">Your Own</small></span>
-          </label>
-        </div>
-        <div class="own" id="own" hidden>
-          <label class="field"><span>다른 종류 고르기</span>
-            <select id="ownGenre" class="en">
-              <option value="">— 골라 주세요 —</option>
-              ${cat.others.map(g => `<option value="${g.id}">${g.plural} (${g.ko})</option>`).join('')}
-            </select>
-          </label>
-        </div>
+        <div class="q-title"><span class="num">1</span> 무엇과 무엇을 비교할까요?</div>
+        <div class="opts">${pairs}</div>
       </div>
-
       <div class="q">
-        <div class="q-title"><span class="num">2</span> ${cat.recAsk}</div>
-        <select id="rec" class="en"></select>
-        <p class="sub" id="recNote"></p>
+        <div class="q-title"><span class="num">2</span> 둘 중 무엇을 더 좋아하나요?</div>
+        <div class="opts" id="picks"></div>
+        <p class="sub" id="pickNote"></p>
       </div>
-
       <div class="q">
-        <div class="q-title"><span class="num">3</span> 어떤 점이 좋나요? <span class="en" style="font-weight:500;color:var(--muted)">It's really ___.</span></div>
-        <select id="adj" class="en"></select>
+        <div class="q-title"><span class="num">3</span> 왜 더 좋아하나요? <span class="en" style="font-weight:500;color:var(--muted)">I love ___ like ___.</span></div>
+        <select id="reason" class="en"></select>
       </div>
     </div>
 
     <div class="card preview">
-      <h3>이렇게 대화하게 돼요 <small style="color:var(--muted);font-weight:500">(내가 추천하는 역할)</small></h3>
+      <h3>이렇게 대화하게 돼요 <small style="color:var(--muted);font-weight:500">(내가 대답하는 역할)</small></h3>
       <p class="read-first">다음으로 넘어가기 전에 <b>전체 대화를 읽어 보고 가세요.</b></p>
       <div id="pv"></div>
-      <p class="tip">영화·책은 <b class="en">a/an</b>, 음식은 <b class="en">some</b>을 써요.
-        <span class="en">Can you recommend <b>a</b> movie? / Can you recommend <b>some</b> food?</span></p>
+      <p class="tip"><b class="en">more</b> 대신 <b class="en">better</b>를 써도 돼요. 마지막 문장의 <b class="en">It's because</b>는 빼도 되고, 내 이유로 바꿔 말해도 돼요.</p>
     </div>`;
 
   const panel = $('#panel');
-  const ownSel = $('#ownGenre', panel), recSel = $('#rec', panel), adjSel = $('#adj', panel);
-
-  $$('input[name=pick]', panel).forEach(r => { r.checked = String(c.pick) === r.value; });
-  ownSel.value = c.ownGenre;
-
-  const onGenreChange = () => {
-    sanitizeChoice(key);
-    fillChoiceSelects(key);
-    save();
-    updateStep();
-  };
-  $$('input[name=pick]', panel).forEach(r => r.addEventListener('change', () => {
-    c.pick = r.value === 'own' ? 'own' : Number(r.value);
-    onGenreChange();
-    if (c.pick === 'own' && !c.ownGenre) ownSel.focus();
-  }));
-  ownSel.addEventListener('change', () => { c.ownGenre = ownSel.value; onGenreChange(); });
-  recSel.addEventListener('change', () => {
-    c.rec = recSel.value;
-    fillChoiceSelects(key); // 음식을 고르면 그 음식에 맞는 형용사를 위로
-    save();
-    updateStep();
+  const c = state.choices[key];
+  $$('input[name=pair]', panel).forEach(r => {
+    r.checked = String(c.pair) === r.value;
+    r.addEventListener('change', () => {
+      c.pair = Number(r.value); c.pick = null; c.reason = '';
+      save(); fillChoices(key); updateStep();
+    });
   });
-  adjSel.addEventListener('change', () => { c.adj = adjSel.value; save(); updateStep(); });
-
-  fillChoiceSelects(key);
+  $('#reason', panel).addEventListener('change', e => { c.reason = e.target.value; save(); updateStep(); });
+  fillChoices(key);
   updateStep();
 }
 
-/** 추천·형용사 드롭다운을 고른 장르에 맞게 채움 */
-function fillChoiceSelects(key) {
-  const cat = CATS[key], c = state.choices[key], g = genreOf(key);
-  const panel = $('#panel');
-  const recSel = $('#rec', panel), adjSel = $('#adj', panel);
-  const opt = (v, label) => `<option value="${esc(v)}">${esc(label)}</option>`;
-
-  if (g) {
-    recSel.disabled = false;
-    recSel.innerHTML = opt('', '— 골라 주세요 —')
-      + titlesOf(g).map(t => opt(t.en, t.ko ? `${t.en} (${t.ko})` : t.en)).join('');
-    $('#recNote', panel).textContent = `${cat.emoji} ${g.ko}에 속하는 것만 보여요.`;
-  } else {
-    recSel.disabled = true;
-    recSel.innerHTML = opt('', '— 먼저 1번에서 종류를 골라요 —');
-    $('#recNote', panel).textContent = '';
-  }
-  recSel.value = c.rec;
-
-  const label = ([a, ko]) => `${a} — ${ko}`;
-  const all = cat.adjs;
-  if (g) {
-    // 음식처럼 항목마다 특징 형용사가 있으면 그것을, 없으면 장르의 형용사를 위에 보여 줌
-    const picked = titlesOf(g).find(t => t.en === c.rec);
-    const top = picked && picked.adjs ? picked.adjs : g.adjs;
-    const topName = picked && picked.adjs ? (picked.ko || picked.en) : g.ko;
-    const good = top.map(a => all.find(x => x[0] === a)).filter(Boolean);
-    const rest = all.filter(([a]) => !top.includes(a));
-    adjSel.innerHTML = opt('', '— 골라 주세요 —')
-      + `<optgroup label="⭐ ${esc(topName)}에 잘 어울려요">${good.map(x => opt(x[0], label(x))).join('')}</optgroup>`
-      + `<optgroup label="다른 형용사">${rest.map(x => opt(x[0], label(x))).join('')}</optgroup>`;
-  } else {
-    adjSel.innerHTML = opt('', '— 골라 주세요 —') + all.map(x => opt(x[0], label(x))).join('');
-  }
-  adjSel.value = c.adj;
+/** 2번·3번 칸을 고른 내용에 맞게 채움 */
+function fillChoices(key) {
+  const c = state.choices[key], p = pairOf(key), i = itemOf(key), panel = $('#panel');
+  const picks = $('#picks', panel);
+  picks.innerHTML = p ? p.items.map((x, n) => `
+    <label class="opt"><input type="radio" name="pick" value="${n}" ${c.pick === n ? 'checked' : ''}>
+      <span><span class="en">${esc(x.en)}</span><small>${esc(x.ko)}</small></span>
+    </label>`).join('') : '';
+  $('#pickNote', panel).textContent = p ? '' : '먼저 1번을 골라요.';
+  $$('input[name=pick]', panel).forEach(r => r.addEventListener('change', () => {
+    c.pick = Number(r.value); c.reason = '';
+    save(); fillChoices(key); updateStep();
+  }));
+  const sel = $('#reason', panel);
+  const opt = (v, l) => `<option value="${esc(v)}">${esc(l)}</option>`;
+  sel.disabled = !i;
+  sel.innerHTML = i
+    ? opt('', '— 골라 주세요 —') + i.reasons.map(r => opt(r.en, `I love ${r.en}. (${r.ko})`)).join('')
+    : opt('', '— 먼저 2번을 골라요 —');
+  sel.value = c.reason;
 }
 
-/** 입력이 바뀔 때마다: 미리보기 · 검사 · 버튼 상태만 갱신 (입력 칸은 다시 그리지 않음) */
+/** 입력이 바뀔 때마다: 미리보기 · 검사 · 버튼 상태만 갱신 */
 function updateStep() {
   const key = CAT_KEYS[state.step];
-  const cat = CATS[key];
-  const c = state.choices[key];
   const panel = $('#panel');
-
-  $('#own', panel).hidden = c.pick !== 'own';
   $$('.tab').forEach(t => t.classList.toggle('done', validate(t.dataset.key).length === 0));
 
-  // 미리보기
   const r = resolved(key);
   const slot = v => v ? `<span class="fill">${esc(v)}</span>` : '<span class="blank">?</span>';
-  const a2 = cat.useSome
-    ? `Can you recommend some ${slot(r.kind)} for me?`
-    : `Can you recommend ${slot(r.single)} for me?`;
+  const a = r.pair ? r.pair.items[0].en : '', b = r.pair ? r.pair.items[1].en : '';
   const lines = [
-    ['them', `What kinds of ${key} do you like?`],
-    ['me', `I like ${slot(r.kind)}.`],
-    ['them', a2],
-    ['me', `Sure. I recommend ${slot(r.rec)}. It's really ${slot(r.adj)}.`],
+    ['them', `Which do you like more, ${slot(a)} or ${slot(b)}?`],
+    ['me', `I like ${slot(r.item)} more.`],
+    ['them', `Why do you like ${slot(r.item)} more?`],
+    ['me', `(It's because) I love ${slot(r.reason)}.`],
   ];
   $('#pv', panel).innerHTML = lines.map(([who, text]) => `
     <div class="line">
@@ -1683,10 +1471,8 @@ function updateStep() {
       <span class="say en ${who}">${text}</span>
     </div>`).join('');
 
-  // 검사
   const miss = validate(key);
   $('#missing').innerHTML = miss.map(m => `<li>${esc(m)}</li>`).join('');
-
   const last = state.step === CAT_KEYS.length - 1;
   const nextBtn = $('#nextBtn');
   if (last) {
@@ -1736,71 +1522,44 @@ function newRp() {
 }
 
 function partnerOf(key) {
-  const cat = CATS[key], p = cat.partner;
-  const item = cat.items.find(i => i.plural === p.kind);
-  return Object.assign({ single: item && item.single ? item.single : '' }, p);
+  const p = CATS[key].partner, pr = CATS[key].pairs[p.pair];
+  return { pair: pr, item: pr.items[p.pick].en, reason: p.reason };
 }
 
 /**
  * 한 역할(A 또는 B)로 하는 대사 4개.
  * 학생 대사: text(문장), tpl([빈칸] 표시), ko(한국어 힌트), frags(채점 조각), extras(채점 안 함, 회색 표시)
+ * frags 안의 목록은 그중 하나만 맞아도 인정. free: 이유 문장이라 내용은 보지 않고 말의 틀과 길이만 확인.
  */
 function buildRole(key, role) {
-  const cat = CATS[key];
-  const a1 = `What kinds of ${key} do you like?`;
   if (role === 'A') { // 학생이 A: 친구는 고정된 취향으로 답함
-    const p = partnerOf(key);
-    const a2 = cat.useSome
-      ? {
-        text: `Can you recommend some ${p.kind} for me?`,
-        tpl: `Can you [recommend] some ${p.kind} for [me]?`,
-        ko: `친구가 좋아하는 음식(${p.kind})을 추천해 달라고 부탁하세요. (some 사용)`,
-        frags: ['can you recommend', 'for me'],
-        hl: `some ${p.kind}`, // some + 음식: 채점하지 않고 색으로만 보여 줌
-        koHl: [p.kind, 'some'],
-        extras: [p.kind],
-      }
-      : {
-        text: `Can you recommend ${p.single} for me?`,
-        tpl: `Can you [recommend] ${p.single} for [me]?`,
-        // 제시어는 문장에 들어가는 그대로 단수로 보여 줌 (예: musical movie)
-        ko: `친구가 좋아하는 종류(${p.single.replace(/^an? /, '')}) 하나를 추천해 달라고 부탁하세요. (a/an 사용)`,
-        frags: ['can you recommend', 'for me'],
-        hl: p.single, // a/an + 단수: 채점하지 않고 색으로만 보여 줌
-        koHl: [p.single.replace(/^an? /, ''), 'a/an'],
-        extras: [p.single.replace(/^an? /, '')],
-      };
+    const p = partnerOf(key), [x, y] = p.pair.items;
     return [
-      { id: 'A1', me: true, text: a1, tpl: `What kinds of [${key}] do you [like]?`, ko: cat.hintA1, frags: ['what kinds of', key, 'do you like'], extras: [] },
-      { id: 'B1', me: false, text: `I like ${p.kind}.` },
-      Object.assign({ id: 'A2', me: true }, a2),
-      { id: 'B2', me: false, text: `Sure. I recommend ${p.rec}. It's really ${p.adj}.` },
+      { id: 'A1', me: true, text: askLine(p.pair), tpl: `Which do you like [more], ${x.en} or ${y.en}?`,
+        ko: `친구에게 ${x.ko}과(와) ${y.ko} 중 무엇을 더 좋아하는지 물어보세요.`,
+        frags: ['which do you like', MORE, `${x.en} or ${y.en}`], extras: [] },
+      { id: 'B1', me: false, text: `I like ${p.item} more.` },
+      { id: 'A2', me: true, text: whyLine(p.item), tpl: `[Why] do you like ${p.item} [more]?`,
+        ko: `친구가 ${p.item}을(를) 더 좋아하는 이유를 물어보세요.`,
+        frags: ['why do you like', p.item, MORE], extras: [] },
+      { id: 'B2', me: false, text: reasonLine(p.reason) },
     ];
   }
   const r = resolved(key);
   return [
-    { id: 'A1', me: false, text: a1 },
-    {
-      id: 'B1', me: true,
-      text: `I like ${r.kind}.`,
-      tpl: `I [like] ${r.kind}.`,
-      ko: `내가 좋아하는 종류를 말하세요. (${r.kind})`,
-      frags: ['i like', r.kind],
-      extras: [],
-    },
-    { id: 'A2', me: false, text: cat.useSome ? `Can you recommend some ${r.kind} for me?` : `Can you recommend ${r.single} for me?` },
-    {
-      id: 'B2', me: true,
-      text: `Sure. I recommend ${r.rec}. It's really ${r.adj}.`,
-      tpl: `Sure. I [recommend] ${r.rec}. It's [really] ${r.adj}.`,
-      ko: `추천하는 것과, 그것이 어떤지 말하세요. (${r.rec} · ${r.adj})`,
-      frags: ['i recommend', "it's really", r.adj],
-      extras: ['sure', r.rec], // 작품명·음식명은 채점하지 않음
-    },
+    { id: 'A1', me: false, text: askLine(r.pair) },
+    { id: 'B1', me: true, text: `I like ${r.item} more.`, tpl: `I [like] ${r.item} [more].`,
+      ko: `내가 더 좋아하는 것을 말하세요. (${r.item})`,
+      frags: ['i like', r.item, MORE], extras: [] },
+    { id: 'A2', me: false, text: whyLine(r.item) },
+    { id: 'B2', me: true, free: true, text: reasonLine(r.reason),
+      tpl: `It's because I [love] ${r.reason.replace(' like ', ' [like] ')}.`,
+      ko: `더 좋아하는 이유를 말하세요. (${r.reasonKo}) 내 이유로 바꿔 말해도 돼요.`,
+      frags: [['i love', 'i like', 'i enjoy', 'because']], extras: [] },
   ];
 }
 
-/** 라운드 순서: 라운드 1 = 학생이 B(추천하기), 라운드 2 = 학생이 A(추천 부탁하기) */
+/** 라운드 순서: 라운드 1 = 학생이 B(대답하기), 라운드 2 = 학생이 A(물어보기) */
 const ROUND_ROLE = { 1: 'B', 2: 'A' };
 const buildRound = (key, round) => buildRole(key, ROUND_ROLE[round]);
 /** 대사 기록 키 (대사 id는 카테고리 안에서 겹치지 않음) */
@@ -1818,8 +1577,9 @@ const lineDone = rec => !!rec && (rec.passed || rec.needsPractice);
 function scoreAlts(alts, line) {
   let best = null;
   alts.forEach(a => {
-    const frags = line.frags.map(f => ({ f, ok: fragmentScore(a.text, f) >= PASS_SCORE }));
-    const extras = line.extras.map(f => ({ f, ok: fragmentScore(a.text, f) >= 0.75 }));
+    const frags = line.frags.map(f => ({ f: fragLabel(f), ok: fragPass(a.text, f, PASS_SCORE) }));
+    if (line.free) frags.push({ f: '4단어 이상', ok: normalize(a.text).split(' ').length >= 4 });
+    const extras = line.extras.map(f => ({ f: fragLabel(f), ok: fragPass(a.text, f, 0.75) }));
     const n = frags.filter(x => x.ok).length;
     if (!best || n > best.n) best = { text: a.text, frags, extras, n, pass: n === frags.length };
   });
@@ -1872,10 +1632,10 @@ function renderIntro(key) {
   const R = state.rp, cat = CATS[key], r = resolved(key);
   const first = R.ci === 0 && R.round === 1 && Object.keys(R.records).length === 0;
   const body = ROUND_ROLE[R.round] === 'A'
-    ? `<p>이번엔 내가 <b>A</b> — <b>추천을 부탁하는 사람</b>이에요.</p>
-       <p class="sub">${cat.hintA1.replace('물어보세요.', '묻고,')} 추천해 달라고 부탁해요.</p>`
-    : `<p>이번엔 내가 <b>B</b> — <b>추천하는 사람</b>이에요.</p>
-       <p class="sub">내가 정한 것: <span class="en"><b>${esc(r.kind)}</b> · <b>${esc(r.rec)}</b> · <b>${esc(r.adj)}</b></span></p>`;
+    ? `<p>이번엔 내가 <b>A</b> — <b>무엇을 더 좋아하는지 묻는 사람</b>이에요.</p>
+       <p class="sub">친구에게 둘 중 무엇을 더 좋아하는지 묻고, 이유도 물어봐요.</p>`
+    : `<p>이번엔 내가 <b>B</b> — <b>더 좋아하는 것을 답하는 사람</b>이에요.</p>
+       <p class="sub">내가 정한 것: <span class="en"><b>${esc(r.item)}</b> · <b>${esc(r.reason)}</b></span></p>`;
   const how = state.settings.mode === 'hold' ? '<b>누른 채로</b> 말하고, 다 말하면 떼세요' : '<b>한 번</b> 누르고 말하세요';
   $('#rpIntro').innerHTML = `
     <h2>${cat.emoji} ${cat.label} — 라운드 ${R.round}</h2>
@@ -1913,7 +1673,7 @@ async function playPartner(lk, text) {
 
 function renderLine() {
   const { R, key, lines, line, lk } = current();
-  $('#rpRound').textContent = `라운드 ${R.round} · 나는 ${ROUND_ROLE[R.round] === 'A' ? 'A (추천을 부탁하는 사람)' : 'B (추천하는 사람)'}`;
+  $('#rpRound').textContent = `라운드 ${R.round} · 나는 ${ROUND_ROLE[R.round] === 'A' ? 'A (묻는 사람)' : 'B (답하는 사람)'}`;
 
   // 새로고침 직후에는 브라우저가 자동 재생을 막으므로 [듣기] 버튼을 누르게 함
   const needTap = !line.me && playingKey !== lk && navigator.userActivation && !navigator.userActivation.hasBeenActive;
@@ -2118,20 +1878,17 @@ function cardData() {
   const R = state.rp;
   const cats = CAT_KEYS.map(k => {
     const r = resolved(k);
-    const title = titlesOf(genreOf(k)).find(t => t.en === r.rec);
     const [B, A] = ['B', 'A'].map(role => buildRole(k, role).filter(l => l.me).map(l => {
       const rec = R.records[recKey(k, l.id)];
+      const passed = rec && rec.passed;
       return {
-        id: l.id, text: l.text,
+        id: l.id, // 이유는 학생이 바꿔 말할 수 있으므로 실제로 들린 문장을 적음
+        text: l.free && passed && rec.heard ? rec.heard.charAt(0).toUpperCase() + rec.heard.slice(1) : l.text,
         attempts: rec ? rec.attempts : 0,
-        status: rec && rec.passed ? 'pass' : rec && rec.needsPractice ? 'practice' : 'none',
+        status: passed ? 'pass' : rec && rec.needsPractice ? 'practice' : 'none',
       };
     }));
-    return {
-      cat: CATS[k], kind: r.kind, adj: r.adj,
-      rec: title && title.ko ? `${r.rec} (${title.ko})` : r.rec,
-      B, A, self: R.selfEval[k] || '-',
-    };
+    return { cat: CATS[k], item: `${r.item} (${r.itemKo})`, reason: r.reason, B, A, self: R.selfEval[k] || '-' };
   });
   let most = null;
   cats.forEach(c => [...c.B, ...c.A].forEach(l => { if (!most || l.attempts > most.attempts) most = l; }));
@@ -2195,7 +1952,7 @@ function paintCard(ctx, d) {
   ctx.fillText('중2 영어 · Check and Talk', X, 34);
   ctx.fillStyle = '#FBFBFB';
   cardFont(ctx, 42, 800);
-  ctx.fillText('추천 요청 롤플레이 결과', X, 70);
+  ctx.fillText('선호 묻기 롤플레이 결과', X, 70);
   ctx.textAlign = 'right';
   cardFont(ctx, 30, 700);
   ctx.fillText(state.profile.num, W - X, 40);
@@ -2258,17 +2015,17 @@ function paintCard(ctx, d) {
       ctx.fillText(label, X + P, by);
       ctx.fillStyle = CC.ink;
       cardFont(ctx, 23, 700);
-      ctx.fillText(value, X + P + 150, by - 1);
+      ctx.fillText(value, X + P + 170, by - 1);
       by += 34;
     };
-    info('내가 고른 종류', c.kind);
-    info('내 추천', `${c.rec}  —  ${c.adj}`);
+    info('더 좋아하는 것', c.item);
+    info('이유', c.reason);
     by += 18;
 
     ctx.fillStyle = CC.muted;
     cardFont(ctx, 21, 700);
-    ctx.fillText('B 역할 · 추천하기', X + P, by);
-    ctx.fillText('A 역할 · 추천 부탁하기', X + P + colW + colGap, by);
+    ctx.fillText('B 역할 · 답하기', X + P, by);
+    ctx.fillText('A 역할 · 묻기', X + P + colW + colGap, by);
     by += 32;
 
     [0, 1].forEach(i => {
@@ -2369,7 +2126,7 @@ function renderScreen4() {
 $('#saveCard').addEventListener('click', () => {
   const msg = $('#saveMsg');
   const fail = () => showMsg(msg, 'err',
-    '😥 이미지 저장이 안 됐어요. <b>화면을 캡처해서 올려 주세요.</b><br>크롬북: <kbd>Ctrl</kbd> + <kbd>창 보기 ⧉</kbd> 키를 누르면 화면 전체가 캡처돼요.');
+    '😥 이미지 저장이 안 됐어요. <b>화면을 캡처해 주세요.</b><br>크롬북: <kbd>Ctrl</kbd> + <kbd>창 보기 ⧉</kbd> 키를 누르면 화면 전체가 캡처돼요.');
   try {
     $('#cardCanvas').toBlob(blob => {
       if (!blob) { fail(); return; }
@@ -2381,118 +2138,28 @@ $('#saveCard').addEventListener('click', () => {
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 10000);
-      state.submit.saved = true;
-      state.submit.checks.save = true;
+      state.cardSaved = true;
       save();
-      if (state.screen === 5) renderScreen5();
-      showMsg(msg, 'ok', `✅ 저장했어요! <b>${esc(cardFileName())}</b><br>크롬북 <b>파일 앱 → 다운로드</b> 폴더에 있어요. 이 파일을 패들렛에 올려요.`);
+      showMsg(msg, 'ok', `✅ 저장했어요! <b>${esc(cardFileName())}</b><br>크롬북 <b>파일 앱 → 다운로드</b> 폴더에 있어요.`);
     }, 'image/png');
   } catch (e) {
     fail();
   }
 });
 
-/* =========================================================
- * 화면 5: 패들렛 제출
- * ========================================================= */
-/** 패들렛 글 제목: 번호 4자리 (예: 2301) */
-function postTitle() {
-  return String(state.profile.num).trim();
-}
-
-function submitSteps() {
-  return [
-    { id: 'save', t: '결과 카드 이미지를 저장해요',
-      d: state.submit.saved
-        ? `저장한 파일: <b>${esc(cardFileName())}</b> (파일 앱 → 다운로드)`
-        : '아직 저장하지 않았다면 아래 버튼을 눌러요. 저장이 안 되면 결과 카드 화면을 캡처해요.',
-      extra: '<button type="button" class="btn" data-act="save">이미지로 저장</button>' },
-    { id: 'name', t: '번호를 복사해요',
-      d: '<b>복사</b>를 누르면 패들렛 제목 칸에 붙여 넣을 수 있어요.',
-      extra: `<div class="copy-row"><code>${esc(postTitle())}</code><button type="button" class="btn" data-act="copy">복사</button></div>` },
-    { id: 'post', t: '패들렛에 올려요',
-      d: `<ol class="howto">
-          <li>아래 <b>패들렛 열기</b>를 눌러 패들렛을 열어요. (이 앱 탭은 닫지 마세요)</li>
-          <li>오른쪽 아래 동그란 <b>＋</b> 버튼을 눌러요.</li>
-          <li>제목 칸에 번호를 붙여 넣어요. <kbd>Ctrl</kbd> + <kbd>V</kbd></li>
-          <li><b>업로드</b> → <b>파일 앱의 다운로드 폴더</b>에서 결과 카드 이미지를 골라요.</li>
-          <li><b>게시</b> 버튼을 눌러요.</li>
-        </ol>`,
-      extra: PADLET_URL ? '<a class="btn primary" data-act="open" target="_blank" rel="noopener">패들렛 열기</a>' : '' },
-  ];
-}
-
-function renderScreen5() {
-  const miss = $('#padletMissing');
-  miss.hidden = !!PADLET_URL;
-  if (!PADLET_URL) miss.innerHTML = '<div class="banner warn">📌 패들렛 주소가 설정되지 않았어요. <b>선생님이 알려 준 패들렛</b>을 직접 열어서 올려 주세요.</div>';
-  const checks = state.submit.checks;
-  const steps = submitSteps();
-  $('#submitSteps').innerHTML = steps.map((st, i) => `
-    <li class="${checks[st.id] ? 'done' : ''}" data-id="${st.id}">
-      <span class="num">${checks[st.id] ? '✓' : i + 1}</span>
-      <div class="body">
-        <b class="t">${st.t}</b>
-        <div class="sub">${st.d}</div>
-        ${st.extra || ''}
-      </div>
-      <label class="check"><input type="checkbox" ${checks[st.id] ? 'checked' : ''}> 했어요</label>
-    </li>`).join('');
-  $$('#submitSteps a[data-act="open"]').forEach(a => { a.href = PADLET_URL || '#'; });
-
-  const left = steps.filter(st => !checks[st.id]).length;
-  const done = state.submit.done;
-  $('#submitDone').disabled = left > 0;
-  $('#submitDone').hidden = done;
-  $('#submitLeft').hidden = done;
-  $('#submitLeft').textContent = left > 0 ? `남은 단계: ${left}개` : '모든 단계를 끝냈어요. 제출 완료를 눌러요!';
-  $('#submitFinish').hidden = !done;
-}
-
-$('#submitSteps').addEventListener('change', e => {
-  const li = e.target.closest('li[data-id]');
-  if (!li) return;
-  state.submit.checks[li.dataset.id] = e.target.checked;
-  if (!e.target.checked) state.submit.done = false;
-  save();
-  renderScreen5();
-});
-
-$('#submitSteps').addEventListener('click', e => {
-  const act = e.target.closest('[data-act]');
-  if (!act) return;
-  if (act.dataset.act === 'save') {
-    drawCard(); // 화면 4를 거치지 않고 왔을 때도 최신 카드로 저장
-    $('#saveCard').click();
-  } else if (act.dataset.act === 'copy') {
-    const reset = t => {
-      const b = $('#submitSteps [data-act="copy"]');
-      b.textContent = t;
-      setTimeout(() => { b.textContent = '복사'; }, 1800);
-    };
-    const copied = () => {
-      state.submit.checks.name = true;
-      save();
-      renderScreen5();
-      reset('✅ 복사했어요');
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(postTitle()).then(copied, () => reset('직접 적어 주세요'));
-    } else {
-      reset('직접 적어 주세요');
-    }
+/* 끝내기: 소리 설정만 남기고 기록을 지워 다음 학생이 처음부터 시작 */
+let skipSaveWarned = false;
+$('#finishBtn').addEventListener('click', () => {
+  if (!state.cardSaved && !skipSaveWarned) {
+    skipSaveWarned = true;
+    showMsg($('#finishMsg'), 'info', '📷 아직 결과 카드를 저장하지 않았어요. 저장하지 않고 끝내려면 <b>끝내기</b>를 한 번 더 누르세요.');
+    return;
   }
+  const next = defaultState();
+  next.settings = state.settings;
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(next)); } catch (e) { /* 무시 */ }
+  location.reload();
 });
-
-$('#submitDone').addEventListener('click', () => {
-  state.submit.done = true;
-  save();
-  renderScreen5();
-  $('#submitFinish').scrollIntoView({ behavior: 'smooth', block: 'center' });
-});
-
-$('#toSubmit').addEventListener('click', () => go(5));
-$('#backToCard').addEventListener('click', () => go(4));
 
 /* =========================================================
  * 시작
