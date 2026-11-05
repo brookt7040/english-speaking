@@ -275,6 +275,14 @@
   .selfbtn span { display: block; font-size: 44px; line-height: 1.2; }
   .selfbtn:hover { border-color: var(--primary); background: var(--primary-soft); }
 
+  /* 결과 카드 2의 연습하기 버튼 (저장 이미지에는 들어가지 않음) */
+  .card2-wrap { position: relative; }
+  .redo-btn {
+    position: absolute; padding: 6px 12px; font-size: 14px; font-weight: 700; cursor: pointer;
+    border: 0; border-radius: 8px; background: var(--primary); color: var(--card);
+  }
+  .redo-btn.done { background: var(--card); color: var(--ink); box-shadow: 0 0 0 1.5px var(--green); }
+
   /* 이유 문장 통과 조건 */
   #reason { max-width: 100%; }
   .rule { margin-top: 12px; padding: 12px 16px; border-radius: 10px; background: var(--green-soft); font-size: 16px; }
@@ -514,11 +522,15 @@
 
   <!-- ======================= 화면 4: 결과 카드 ======================= -->
   <section class="screen" data-screen="4" hidden>
+    <div id="s4Main">
     <h1>모두 끝났어요!</h1>
     <p class="lead">결과 카드를 이미지로 저장해요.</p>
     <div class="card" style="padding:12px">
       <canvas id="cardCanvas" class="result-card" aria-label="롤플레이 결과 카드"></canvas>
-      <canvas id="cardCanvas2" class="result-card" aria-label="대사별 피드백이 담긴 결과 카드 2" hidden></canvas>
+      <div class="card2-wrap" id="card2Wrap" hidden>
+        <canvas id="cardCanvas2" class="result-card" aria-label="대사별 피드백이 담긴 결과 카드 2"></canvas>
+        <div id="card2Btns"></div>
+      </div>
     </div>
     <div class="start-area">
       <button type="button" class="btn big" id="cardSwitch">결과 카드 2 보기 ▶</button>
@@ -530,6 +542,28 @@
       <div id="finishMsg" hidden></div>
       <button type="button" class="btn big" id="finishBtn" style="margin-top:12px">끝내기 ✓</button>
       <p class="sub">끝내면 이 기기의 연습 기록이 지워져서 다음 학생이 처음부터 시작할 수 있어요.</p>
+    </div>
+    </div>
+
+    <div id="redoBox" hidden>
+      <h1>다시 연습해요</h1>
+      <p class="lead" id="redoWho"></p>
+      <div class="card turn">
+        <div class="model" style="padding:0">
+          <div class="target en" id="redoTarget"></div>
+          <button type="button" class="btn" id="redoHear">🔊 듣기</button>
+        </div>
+        <p class="sub" id="redoHint" hidden><b class="en">I love, I like, I enjoy, because</b> 중 하나를 넣어 <b>4단어 이상</b>으로 말해요. 내 이유로 바꿔도 돼요.</p>
+        <div class="meter-row">내 목소리 <div class="meter"><i></i></div></div>
+        <button type="button" class="btn primary" id="redoMic" hidden>🎤 마이크 켜기</button>
+        <button type="button" class="ptt" id="redoPtt"></button>
+        <div class="kbd-hint"></div>
+        <div id="redoErr" hidden></div>
+        <div id="redoResult" hidden></div>
+      </div>
+      <div class="nav-row" style="justify-content:flex-end">
+        <button type="button" class="btn primary big" id="redoBack">◀ 결과 카드로 돌아가기</button>
+      </div>
     </div>
   </section>
 </main>
@@ -2048,6 +2082,7 @@ function cardData() {
       const rec = R.records[recKey(k, l.id)];
       const passed = rec && rec.passed;
       return {
+        key: k, redo: (rec && rec.redo) || '',
         target: l.text, free: !!l.free, tries: (rec && rec.tries) || [],
         id: l.id, // 이유는 학생이 바꿔 말할 수 있으므로 실제로 들린 문장을 적음
         text: l.free && passed && rec.heard ? rec.heard.charAt(0).toUpperCase() + rec.heard.slice(1) : l.text,
@@ -2292,6 +2327,7 @@ function nextGoal(lines) {
 function paintCard2(ctx, d) {
   const W = CARD_W, X = CARD_PAD, IW = W - CARD_PAD * 2, P = 24;
   let y = cardTop(ctx, d, '선호 묻기 롤플레이 피드백');
+  d.boxes = []; // 연습하기 버튼을 놓을 자리
 
   const lines = [];
   d.cats.forEach(c => [...c.B, ...c.A].forEach(l => lines.push({ ...l, cat: c.cat })));
@@ -2351,8 +2387,10 @@ function paintCard2(ctx, d) {
     const failed = [...l.tries].reverse().find(t => !t.ok);
     const tip = failed && failed.miss.length
       ? block(`→ 다음엔: ${missTip(failed.miss[0])[1]}`, 22, 700, CC.ink, IW - P * 2) : null;
+    const redo = l.redo ? block(`✓ 다시 연습 통과: “${l.redo}”`, 22, 700, CC.ink, IW - P * 2) : null;
     const h = 18 + 30 + head.h + 10 + tries.reduce((n, t) => n + t.said.h + t.mark.h + 8, 0)
-      + (tip ? tip.h + 8 : 0) + 16;
+      + (tip ? tip.h + 8 : 0) + (redo ? redo.h + 8 : 0) + 16;
+    d.boxes.push({ key: l.key, id: l.id, bottom: y + h, done: !!l.redo });
     roundBox(ctx, X, y, IW, h, 14, st.bg, st.border);
     let by = y + 18;
     ctx.fillStyle = CC.muted;
@@ -2367,7 +2405,8 @@ function paintCard2(ctx, d) {
       by = put(t.said, X + P, by);
       by = put(t.mark, X + P + 44, by) + 8;
     });
-    if (tip) put(tip, X + P, by);
+    if (tip) by = put(tip, X + P, by) + 8;
+    if (redo) put(redo, X + P, by);
     y += h + 14;
   });
   y += 14;
@@ -2418,6 +2457,10 @@ function drawCard() {
   const d = cardData(), used = new Map(); // 글꼴 → 그 글꼴로 그린 글자
   drawOn($('#cardCanvas'), paintCard, d, used);
   drawOn($('#cardCanvas2'), paintCard2, d, used);
+  const H = $('#cardCanvas2').height;
+  $('#card2Btns').innerHTML = d.boxes.map(b => `<button type="button" class="redo-btn${b.done ? ' done' : ''}"
+    data-k="${b.key}" data-id="${b.id}"
+    style="top:${(b.bottom - 58) / H * 100}%;right:${(CARD_PAD + 24) / CARD_W * 100}%">${b.done ? '✓ 또 연습하기' : '연습하기'}</button>`).join('');
   return used;
 }
 
@@ -2432,7 +2475,7 @@ function cardFileName() {
 
 function showCardView() {
   $('#cardCanvas').hidden = cardView !== 1;
-  $('#cardCanvas2').hidden = cardView !== 2;
+  $('#card2Wrap').hidden = cardView !== 2;
   $('#cardSwitch').textContent = cardView === 1 ? '결과 카드 2 보기 ▶' : '◀ 결과 카드 1로 돌아가기';
   $('#cardFile').textContent = `파일 이름: ${cardFileName()}`;
   $('#saveMsg').hidden = true;
@@ -2443,9 +2486,68 @@ $('#cardSwitch').addEventListener('click', () => {
   window.scrollTo(0, 0);
 });
 
+/* 결과 카드 2의 연습하기: 처음 기록은 그대로 두고, 통과하면 카드에 함께 적어 줌 */
+let redoLine = null;
+function openRedo(key, id) {
+  const line = buildRole(key, id[0]).find(l => l.id === id);
+  redoLine = { key, line, rec: state.rp.records[recKey(key, id)] };
+  $('#s4Main').hidden = true;
+  $('#redoBox').hidden = false;
+  $('#redoWho').textContent = `${CATS[key].emoji} ${CATS[key].label} · ${id}`;
+  $('#redoTarget').textContent = line.text;
+  $('#redoHint').hidden = !line.free;
+  $('#redoErr').hidden = true;
+  $('#redoResult').hidden = true;
+  $('#redoMic').hidden = Mic.ready;
+  $('#redoPtt').hidden = !Mic.ready;
+  PTT.active = Mic.ready ? redoPtt : null;
+  redoPtt.render();
+  window.scrollTo(0, 0);
+}
+$('#card2Btns').addEventListener('click', e => {
+  const b = e.target.closest('.redo-btn');
+  if (b) openRedo(b.dataset.k, b.dataset.id);
+});
+const redoPtt = PTT.create($('#redoPtt'), {
+  onStart() { $('#redoErr').hidden = true; },
+  onResult(alts) {
+    if (!redoLine) return;
+    const s = scoreAlts(alts, redoLine.line);
+    const chips = s.frags.map(x => `<span class="frag en ${x.ok ? 'ok' : 'miss'}">${x.ok ? '✓' : '✕'} ${esc(x.f)}</span>`).join('');
+    const heard = `<div>이렇게 들렸어요:</div><div class="heard en">“${esc(s.text)}”</div><div class="frags">${chips}</div>`;
+    if (s.pass) {
+      redoLine.rec.redo = s.text;
+      save();
+      showMsg($('#redoResult'), 'ok', `<div class="good"><span class="mark ok">✓</span> 좋아요! 결과 카드에 적어 둘게요.</div>${heard}`);
+    } else {
+      showMsg($('#redoResult'), 'err', `${heard}<div style="margin-top:8px">✕ 표시된 부분을 살려서 다시 말해 보세요.</div>`);
+    }
+  },
+  onError(html) { showMsg($('#redoErr'), 'err', html); },
+});
+$('#redoHear').addEventListener('click', () => { if (redoLine && !TTS.busy) TTS.speak(redoLine.line.text); });
+$('#redoMic').addEventListener('click', async () => {
+  const r = await Mic.init();
+  if (r.ok) openRedo(redoLine.key, redoLine.line.id);
+  else showMsg($('#redoErr'), 'err', r.msg);
+});
+$('#redoBack').addEventListener('click', () => {
+  redoPtt.cancel();
+  redoLine = null;
+  PTT.active = null;
+  $('#redoBox').hidden = true;
+  $('#s4Main').hidden = false;
+  refreshCards();
+  showCardView();
+  window.scrollTo(0, 0);
+});
+
 function renderScreen4() {
   cardView = 1;
   showCardView();
+  refreshCards();
+}
+function refreshCards() {
   const used = drawCard();
   // 웹 글꼴은 쓰는 글자만 나눠 받으므로, 카드에만 나오는 글자도 받은 뒤 다시 그림
   if (!document.fonts || !document.fonts.load) return;
