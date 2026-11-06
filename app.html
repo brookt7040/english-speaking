@@ -449,7 +449,7 @@
     </div>
 
     <div class="privacy-box">
-      <p>이름은 받지 않습니다. 연습 기록은 이 기기에 저장되고, 전송 버튼을 누르면 번호, 연습 결과, 결과 카드 이미지가 선생님의 구글 시트와 드라이브로 전송됩니다.</p>
+      <p>이름은 받지 않습니다. 연습 기록은 이 기기에 저장되고, 전송 버튼을 누르면 결과 카드 이미지가 선생님의 구글 드라이브로 전송됩니다.</p>
       <a class="btn" href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a>
     </div>
   </section>
@@ -547,7 +547,7 @@
     </div>
     <div class="start-area">
       <button type="button" class="btn primary big" id="sendBtn" style="margin-top:12px">선생님한테 결과 전송하기</button>
-      <p class="sub">번호, 연습 결과, 결과 카드 이미지가 선생님의 구글 시트와 드라이브로 전송돼요. 음성은 보내지 않아요.
+      <p class="sub">결과 카드 이미지가 선생님의 구글 드라이브로 전송돼요. 음성은 보내지 않아요.
         <a href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></p>
       <div id="sendMsg" hidden></div>
       <div id="finishMsg" hidden></div>
@@ -2474,26 +2474,12 @@ $('#saveCard').addEventListener('click', () => {
   }
 });
 
-/* 선생님한테 결과 전송: Apps Script가 구글 시트에 한 줄로 저장 */
+/* 선생님한테 결과 전송: Apps Script가 결과 카드 이미지를 구글 드라이브에 저장 */
 function resultPayload() {
-  const d = cardData(), lines = cardLines(d), s = d.s;
-  const dt = d.date;
-  const detail = l => `[${l.cat.label} ${l.id}] ${l.free ? '내 이유 말하기' : l.target}\n`
-    + l.tries.map((t, i) => `  ${i + 1}차 "${t.heard}"${t.ok ? ' ✓' : ` ✕ ${t.miss.join(', ')}`}`).join('\n')
-    + (l.redo ? `\n  다시 연습 통과 "${l.redo}"` : '');
-  const reasons = {};
-  d.cats.forEach(c => {
-    const l = c.B.find(x => x.free), last = l && l.tries[l.tries.length - 1];
-    reasons[c.cat.label] = last ? last.heard : '';
-  });
-  const review = lines.filter(needsReview);
+  const dt = cardData().date;
   return {
     lesson: '7', num: String(state.profile.num),
     date: `${dt.getFullYear()}-${two(dt.getMonth() + 1)}-${two(dt.getDate())}`,
-    passed: s.passed, total: s.lines, avgAttempts: Number(s.avgAttempts.toFixed(1)),
-    levels: `${s.startLevel} → ${s.endLevel}`, selfEval: s.selfEval.join(' '), minutes: s.minutes,
-    goal: nextGoal(lines), reviewCount: review.length, redoCount: review.filter(l => l.redo).length,
-    detail: review.map(detail).join('\n'), reasons,
     image: $('#cardCanvas').toDataURL('image/png').split(',')[1],
   };
 }
