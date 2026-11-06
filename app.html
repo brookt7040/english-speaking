@@ -275,8 +275,8 @@
   .selfbtn span { display: block; font-size: 44px; line-height: 1.2; }
   .selfbtn:hover { border-color: var(--primary); background: var(--primary-soft); }
 
-  /* 결과 카드 2의 연습하기 버튼 (저장 이미지에는 들어가지 않음) */
-  .card2-wrap { position: relative; }
+  /* 결과 카드의 연습하기 버튼 (저장 이미지에는 들어가지 않음) */
+  .card-wrap { position: relative; }
   .redo-btn {
     position: absolute; padding: 6px 12px; font-size: 14px; font-weight: 700; cursor: pointer;
     border: 0; border-radius: 8px; background: var(--primary); color: var(--card);
@@ -526,14 +526,12 @@
     <h1>모두 끝났어요!</h1>
     <p class="lead">결과 카드를 이미지로 저장해요.</p>
     <div class="card" style="padding:12px">
-      <canvas id="cardCanvas" class="result-card" aria-label="롤플레이 결과 카드"></canvas>
-      <div class="card2-wrap" id="card2Wrap" hidden>
-        <canvas id="cardCanvas2" class="result-card" aria-label="대사별 피드백이 담긴 결과 카드 2"></canvas>
-        <div id="card2Btns"></div>
+      <div class="card-wrap" id="cardWrap">
+        <canvas id="cardCanvas" class="result-card" aria-label="대사별 피드백이 담긴 결과 카드"></canvas>
+        <div id="cardBtns"></div>
       </div>
     </div>
     <div class="start-area">
-      <button type="button" class="btn big" id="cardSwitch">결과 카드 2 보기 ▶</button>
       <button type="button" class="btn primary big" id="saveCard">이미지로 저장</button>
       <p class="sub" id="cardFile"></p>
       <div id="saveMsg" hidden></div>
@@ -2010,7 +2008,7 @@ const rpPtt = PTT.create($('#rpPtt'), {
     rec.frags = s.frags;
     rec.extras = s.extras;
     rec.dropped = false;
-    // 결과 카드 2에 보여 줄 시도별 기록
+    // 결과 카드에 보여 줄 시도별 기록
     (rec.tries = rec.tries || []).push({ heard: s.text, ok: s.pass, miss: s.frags.filter(x => !x.ok).map(x => x.f) });
     if (s.pass) {
       rec.passed = true;
@@ -2077,7 +2075,6 @@ function summary() {
 function cardData() {
   const R = state.rp;
   const cats = CAT_KEYS.map(k => {
-    const r = resolved(k);
     const [B, A] = ['B', 'A'].map(role => buildRole(k, role).filter(l => l.me).map(l => {
       const rec = R.records[recKey(k, l.id)];
       const passed = rec && rec.passed;
@@ -2090,12 +2087,10 @@ function cardData() {
         status: passed ? 'pass' : rec && rec.needsPractice ? 'practice' : 'none',
       };
     }));
-    return { cat: CATS[k], item: `${r.item} (${r.itemKo})`, reason: r.reason, B, A, self: R.selfEval[k] || '-' };
+    return { cat: CATS[k], B, A };
   });
-  let most = null;
-  cats.forEach(c => [...c.B, ...c.A].forEach(l => { if (!most || l.attempts > most.attempts) most = l; }));
   const date = new Date(R.finishedAt || Date.now());
-  return { s: summary(), cats, most, date };
+  return { s: summary(), cats, date };
 }
 
 const CARD_W = 1080, CARD_PAD = 48;
@@ -2134,7 +2129,7 @@ function wrapText(ctx, text, maxW) {
 }
 function two(n) { return String(n).padStart(2, '0'); }
 
-/** 머리말과 요약 4칸: 카드 1·2 공통. 다음에 그릴 y를 돌려줌 */
+/** 머리말과 요약 4칸. 다음에 그릴 y를 돌려줌 */
 function cardTop(ctx, d, title) {
   const W = CARD_W, X = CARD_PAD, IW = W - CARD_PAD * 2;
   const { s } = d;
@@ -2186,115 +2181,6 @@ function cardTop(ctx, d, title) {
   return y;
 }
 
-/** 카드를 그리고 전체 높이를 돌려줌 (높이 측정용으로 한 번, 실제로 한 번 호출) */
-function paintCard(ctx, d) {
-  const W = CARD_W, X = CARD_PAD, IW = W - CARD_PAD * 2;
-  const { s } = d;
-  let y = cardTop(ctx, d, '선호 묻기 롤플레이 결과');
-
-  // 카테고리별 표
-  const P = 24, colGap = 20, colW = (IW - P * 2 - colGap) / 2, LH = 30;
-  d.cats.forEach(c => {
-    // 먼저 칸 높이 계산
-    cardFont(ctx, 22, 500);
-    const entry = l => ({ ...l, lines: wrapText(ctx, l.text, colW - 32) });
-    const A = c.A.map(entry), B = c.B.map(entry);
-    const eh = e => 16 + 30 + e.lines.length * LH + 14;
-    const rows = [0, 1].map(i => Math.max(eh(B[i]), eh(A[i])));
-    const blockH = P + 42 + 12 + 34 * 2 + 18 + 32 + rows[0] + 12 + rows[1] + P;
-
-    roundBox(ctx, X, y, IW, blockH, 18, '#FBFBFB', CC.line);
-    let by = y + P;
-
-    ctx.fillStyle = CC.ink;
-    cardFont(ctx, 32, 800);
-    ctx.fillText(`${c.cat.emoji} ${c.cat.label}`, X + P, by);
-    ctx.textAlign = 'right';
-    cardFont(ctx, 36, 500);
-    ctx.fillText(c.self, W - X - P, by - 2);
-    const selfW = ctx.measureText(c.self).width;
-    ctx.fillStyle = CC.muted;
-    cardFont(ctx, 20, 600);
-    ctx.fillText('자기평가', W - X - P - selfW - 12, by + 10);
-    ctx.textAlign = 'left';
-    by += 42 + 12;
-
-    const info = (label, value) => {
-      ctx.fillStyle = CC.muted;
-      cardFont(ctx, 22, 600);
-      ctx.fillText(label, X + P, by);
-      ctx.fillStyle = CC.ink;
-      cardFont(ctx, 23, 700);
-      ctx.fillText(value, X + P + 170, by - 1);
-      by += 34;
-    };
-    info('더 좋아하는 것', c.item);
-    info('이유', c.reason);
-    by += 18;
-
-    ctx.fillStyle = CC.muted;
-    cardFont(ctx, 21, 700);
-    ctx.fillText('B 역할 · 답하기', X + P, by);
-    ctx.fillText('A 역할 · 묻기', X + P + colW + colGap, by);
-    by += 32;
-
-    [0, 1].forEach(i => {
-      [B[i], A[i]].forEach((e, col) => {
-        const ex = X + P + col * (colW + colGap);
-        const st = STATUS[e.status];
-        roundBox(ctx, ex, by, colW, rows[i], 12, st.bg, st.border);
-        ctx.fillStyle = CC.ink;
-        cardFont(ctx, 22, 800);
-        ctx.fillText(e.id, ex + 16, by + 16);
-        ctx.textAlign = 'right';
-        ctx.fillStyle = st.color;
-        cardFont(ctx, 20, 700);
-        ctx.fillText(e.status === 'none' ? st.label : `${st.label} · ${e.attempts}번`, ex + colW - 16, by + 18);
-        ctx.textAlign = 'left';
-        ctx.fillStyle = CC.ink;
-        cardFont(ctx, 22, 500);
-        e.lines.forEach((ln, j) => ctx.fillText(ln, ex + 16, by + 16 + 30 + j * LH));
-      });
-      by += rows[i] + 12;
-    });
-    y += blockH + 20;
-  });
-
-  // 맨 아래: 가장 많이 시도한 표현 · 총 활동 시간
-  y += 4;
-  const most = d.most;
-  const hard = most && most.attempts > 1;
-  cardFont(ctx, 23, 600);
-  const mostLines = hard ? wrapText(ctx, `“${most.text}”  (${most.attempts}번)`, IW - 48) : ['모든 대사를 한 번에 말했어요!'];
-  const mh = 20 + 30 + mostLines.length * 32 + 18;
-  roundBox(ctx, X, y, IW, mh, 16, hard ? CC.yellowSoft : CC.greenSoft);
-  ctx.fillStyle = CC.muted;
-  cardFont(ctx, 21, 700);
-  ctx.fillText('가장 많이 시도한 표현', X + 24, y + 20);
-  ctx.fillStyle = CC.ink;
-  cardFont(ctx, 23, 600);
-  mostLines.forEach((ln, j) => ctx.fillText(ln, X + 24, y + 54 + j * 32));
-  y += mh + 22;
-
-  ctx.fillStyle = CC.ink;
-  cardFont(ctx, 23, 700);
-  ctx.fillText(`⏱ 총 활동 시간  ${s.minutes}분`, X, y);
-  // 색 설명
-  ctx.textAlign = 'right';
-  cardFont(ctx, 20, 600);
-  let lx = W - X;
-  [['기록 없음', STATUS.none], ['다시 연습 필요', STATUS.practice], ['통과', STATUS.pass]].forEach(([label, st]) => {
-    ctx.fillStyle = CC.muted;
-    ctx.fillText(label, lx, y + 3);
-    lx -= ctx.measureText(label).width + 10;
-    roundBox(ctx, lx - 20, y + 4, 20, 20, 5, st.bg, st.border);
-    lx -= 20 + 22;
-  });
-  ctx.textAlign = 'left';
-  y += 34 + CARD_PAD - 10;
-  return y;
-}
-
 /** 놓친 부분 → [묶음 이름, 고칠 점] */
 function missTip(f) {
   if (f === 'more / better') return ['more', 'more나 better까지 끝까지 말해요.'];
@@ -2323,10 +2209,10 @@ function nextGoal(lines) {
     : '모든 대사를 한 번에 통과했어요! 다음엔 문장을 보지 않고 말해 봐요.';
 }
 
-/** 결과 카드 2: 무엇을 어떻게 말했고 다음에 무엇을 고칠지 보여 줌 */
-function paintCard2(ctx, d) {
+/** 결과 카드: 무엇을 어떻게 말했고 다음에 무엇을 고칠지 보여 줌 */
+function paintCard(ctx, d) {
   const W = CARD_W, X = CARD_PAD, IW = W - CARD_PAD * 2, P = 24;
-  let y = cardTop(ctx, d, '선호 묻기 롤플레이 피드백');
+  let y = cardTop(ctx, d, '선호 묻기 롤플레이 결과');
   d.boxes = []; // 연습하기 버튼을 놓을 자리
 
   const lines = [];
@@ -2456,37 +2342,22 @@ function drawOn(canvas, paint, d, used) {
 function drawCard() {
   const d = cardData(), used = new Map(); // 글꼴 → 그 글꼴로 그린 글자
   drawOn($('#cardCanvas'), paintCard, d, used);
-  drawOn($('#cardCanvas2'), paintCard2, d, used);
-  const H = $('#cardCanvas2').height;
-  $('#card2Btns').innerHTML = d.boxes.map(b => `<button type="button" class="redo-btn${b.done ? ' done' : ''}"
+  const H = $('#cardCanvas').height;
+  $('#cardBtns').innerHTML = d.boxes.map(b => `<button type="button" class="redo-btn${b.done ? ' done' : ''}"
     data-k="${b.key}" data-id="${b.id}"
     style="top:${(b.bottom - 58) / H * 100}%;right:${(CARD_PAD + 24) / CARD_W * 100}%">${b.done ? '✓ 또 연습하기' : '연습하기'}</button>`).join('');
   return used;
 }
 
-let cardView = 1; // 지금 보고 있는 카드 (1 또는 2)
-/** 파일명: 번호_날짜.png (예: 2301_20260929.png). 카드 2는 번호_날짜_2.png */
+/** 파일명: 번호_날짜.png (예: 2301_20260929.png). */
 function cardFileName() {
   const dt = new Date(state.rp.finishedAt || Date.now());
   const date = `${dt.getFullYear()}${two(dt.getMonth() + 1)}${two(dt.getDate())}`;
   const safe = s => String(s).trim().replace(/[\\/:*?"<>|\s]+/g, '');
-  return `${safe(state.profile.num)}_${date}${cardView === 2 ? '_2' : ''}.png`;
+  return `${safe(state.profile.num)}_${date}.png`;
 }
 
-function showCardView() {
-  $('#cardCanvas').hidden = cardView !== 1;
-  $('#card2Wrap').hidden = cardView !== 2;
-  $('#cardSwitch').textContent = cardView === 1 ? '결과 카드 2 보기 ▶' : '◀ 결과 카드 1로 돌아가기';
-  $('#cardFile').textContent = `파일 이름: ${cardFileName()}`;
-  $('#saveMsg').hidden = true;
-}
-$('#cardSwitch').addEventListener('click', () => {
-  cardView = cardView === 1 ? 2 : 1;
-  showCardView();
-  window.scrollTo(0, 0);
-});
-
-/* 결과 카드 2의 연습하기: 처음 기록은 그대로 두고, 통과하면 카드에 함께 적어 줌 */
+/* 결과 카드의 연습하기: 처음 기록은 그대로 두고, 통과하면 카드에 함께 적어 줌 */
 let redoLine = null;
 function openRedo(key, id) {
   const line = buildRole(key, id[0]).find(l => l.id === id);
@@ -2504,7 +2375,7 @@ function openRedo(key, id) {
   redoPtt.render();
   window.scrollTo(0, 0);
 }
-$('#card2Btns').addEventListener('click', e => {
+$('#cardBtns').addEventListener('click', e => {
   const b = e.target.closest('.redo-btn');
   if (b) openRedo(b.dataset.k, b.dataset.id);
 });
@@ -2538,13 +2409,12 @@ $('#redoBack').addEventListener('click', () => {
   $('#redoBox').hidden = true;
   $('#s4Main').hidden = false;
   refreshCards();
-  showCardView();
   window.scrollTo(0, 0);
 });
 
 function renderScreen4() {
-  cardView = 1;
-  showCardView();
+  $('#cardFile').textContent = `파일 이름: ${cardFileName()}`;
+  $('#saveMsg').hidden = true;
   refreshCards();
 }
 function refreshCards() {
@@ -2560,7 +2430,7 @@ $('#saveCard').addEventListener('click', () => {
   const fail = () => showMsg(msg, 'err',
     '😥 이미지 저장이 안 됐어요. <b>화면을 캡처해 주세요.</b><br>크롬북: <kbd>Ctrl</kbd> + <kbd>창 보기 ⧉</kbd> 키를 누르면 화면 전체가 캡처돼요.');
   try {
-    $(cardView === 2 ? '#cardCanvas2' : '#cardCanvas').toBlob(blob => {
+    $('#cardCanvas').toBlob(blob => {
       if (!blob) { fail(); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
