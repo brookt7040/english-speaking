@@ -449,7 +449,7 @@
     </div>
 
     <div class="privacy-box">
-      <p>이름은 받지 않습니다. 연습 기록은 이 기기에 저장되고, 전송 버튼을 누르면 번호와 연습 결과가 선생님의 구글 시트로 전송됩니다.</p>
+      <p>이름은 받지 않습니다. 연습 기록은 이 기기에 저장되고, 전송 버튼을 누르면 번호, 연습 결과, 결과 카드 이미지가 선생님의 구글 시트와 드라이브로 전송됩니다.</p>
       <a class="btn" href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a>
     </div>
   </section>
@@ -547,7 +547,7 @@
     </div>
     <div class="start-area">
       <button type="button" class="btn primary big" id="sendBtn" style="margin-top:12px">선생님한테 결과 전송하기</button>
-      <p class="sub">번호와 연습 결과가 선생님의 구글 시트로 전송돼요. 음성은 보내지 않아요.
+      <p class="sub">번호, 연습 결과, 결과 카드 이미지가 선생님의 구글 시트와 드라이브로 전송돼요. 음성은 보내지 않아요.
         <a href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></p>
       <div id="sendMsg" hidden></div>
       <div id="finishMsg" hidden></div>
@@ -2494,6 +2494,7 @@ function resultPayload() {
     levels: `${s.startLevel} → ${s.endLevel}`, selfEval: s.selfEval.join(' '), minutes: s.minutes,
     goal: nextGoal(lines), reviewCount: review.length, redoCount: review.filter(l => l.redo).length,
     detail: review.map(detail).join('\n'), reasons,
+    image: $('#cardCanvas').toDataURL('image/png').split(',')[1],
   };
 }
 function renderSend() {
