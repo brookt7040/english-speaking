@@ -203,7 +203,7 @@
       <span><b>1번 누르기</b> 1점</span>
       <span><b>2번 누르기</b> 이유까지 2점</span>
       <span><b>3번 누르기</b> 취소</span>
-      <span>회색 번호는 이번 판 쉬어요</span>
+      <span>회색 번호는 쉬는 중 (남은 판 수)</span>
       <span><i style="background:var(--gold)">노랑</i> 1등 <i style="background:var(--gold-soft)">연노랑</i> 2등</span>
     </div>
     <div class="chips" id="chips"></div>
@@ -273,7 +273,8 @@ const FOODS = [
   { en: 'tanghulu', ko: '탕후루', emoji: '🍓', school: false },
 ];
 
-const STORE_KEY = 'lunch_worldcup_v2';
+const STORE_KEY = 'lunch_worldcup_v3';
+const REST_ROUNDS = 2; // 점수를 받으면 쉬는 판 수
 const MAX_NO = 25;
 const SHOW_MS = 1300; // 고른 뒤 "I like ~ more!"를 보여 주는 시간
 
@@ -305,7 +306,7 @@ function newGame() {
     index: 0,            // 이번 라운드의 몇 번째 판인지 (0부터)
     winners: [],         // 다음 라운드로 올라간 후보
     picks: {},           // 이번 판 점수 { 번호: 점수 }
-    resting: [],         // 이번 판 쉬는 번호들
+    resting: {},         // 쉬는 번호와 남은 판 수 { 번호: 남은 판 }
     log: [],             // 지난 판 점수 [{ no, pts }]
     champion: null,
   };
@@ -420,11 +421,11 @@ function renderChips() {
   const box = $('#chips');
   box.innerHTML = S.numbers.map(n => {
     const picked = S.picks[n] || 0;
-    const rest = S.resting.includes(n);
+    const rest = (S.resting[n] || 0) > 0;
     const now = t.get(n).score + picked;
     const rank = rankOf(t.get(n).score);
     const cls = `${rank} ${rest ? 'rest' : picked === 1 ? 'one' : picked === 2 ? 'two' : ''}`;
-    const note = rest ? '쉼' : picked ? `+${picked}점` : `${now}점`;
+    const note = rest ? `쉼 ${S.resting[n]}` : picked ? `+${picked}점` : `${now}점`;
     return `<button type="button" class="chip ${cls}" data-no="${n}" aria-disabled="${rest}">
       <span class="no">${n}</span><span class="pts">${note}</span></button>`;
   }).join('');
@@ -449,7 +450,7 @@ $('#chips').addEventListener('click', e => {
   const b = e.target.closest('.chip');
   if (!b || busy) return;
   const no = Number(b.dataset.no);
-  if (S.resting.includes(no)) return;
+  if (S.resting[no] > 0) return;
   history.push(snapshot());
   const pts = S.picks[no] || 0;
   if (pts === 2) delete S.picks[no];
@@ -475,7 +476,9 @@ function choose(side) {
   S.winners.push(S.current[pos]);
   const scorers = Object.entries(S.picks).map(([no, pts]) => ({ no: Number(no), pts }));
   S.log.push(...scorers);
-  S.resting = scorers.map(x => x.no);
+  // 쉬던 번호는 한 판 줄이고, 이번에 점수를 받은 번호는 새로 쉬기 시작
+  Object.keys(S.resting).forEach(no => { if (--S.resting[no] <= 0) delete S.resting[no]; });
+  scorers.forEach(x => { S.resting[x.no] = REST_ROUNDS; });
   S.picks = {};
   S.index += 1;
   if (S.index * 2 >= S.current.length) {
