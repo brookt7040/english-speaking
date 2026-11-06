@@ -283,6 +283,11 @@
   }
   .redo-btn.done { background: var(--card); color: var(--ink); box-shadow: 0 0 0 1.5px var(--green); }
 
+  /* 개인정보 처리방침 안내 */
+  .privacy-box { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); text-align: center; }
+  .privacy-box p { margin: 0 0 10px; font-size: 15px; color: var(--muted); }
+  .privacy-box .btn { font-size: 15px; padding: 8px 14px; text-decoration: none; }
+
   /* 이유 문장 통과 조건 */
   #reason { max-width: 100%; }
   .rule { margin-top: 12px; padding: 12px 16px; border-radius: 10px; background: var(--green-soft); font-size: 16px; }
@@ -443,6 +448,10 @@
       <button type="button" class="btn primary big" id="startBtn" style="margin-top:12px">시작하기 ▶</button>
     </div>
 
+    <div class="privacy-box">
+      <p>이름은 받지 않습니다. 연습 기록은 이 기기에 저장되고, 전송 버튼을 누르면 번호와 연습 결과가 선생님의 구글 시트로 전송됩니다.</p>
+      <a class="btn" href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a>
+    </div>
   </section>
 
   <!-- ======================= 화면 2: 종류 고르기 ======================= -->
@@ -524,7 +533,7 @@
   <section class="screen" data-screen="4" hidden>
     <div id="s4Main">
     <h1>모두 끝났어요!</h1>
-    <p class="lead">결과 카드를 이미지로 저장해요.</p>
+    <p class="lead">결과를 확인하고 선생님께 전송해요.</p>
     <div class="card" style="padding:12px">
       <div class="card-wrap" id="cardWrap">
         <canvas id="cardCanvas" class="result-card" aria-label="대사별 피드백이 담긴 결과 카드"></canvas>
@@ -537,6 +546,10 @@
       <div id="saveMsg" hidden></div>
     </div>
     <div class="start-area">
+      <button type="button" class="btn primary big" id="sendBtn" style="margin-top:12px">선생님한테 결과 전송하기</button>
+      <p class="sub">번호와 연습 결과가 선생님의 구글 시트로 전송돼요. 음성은 보내지 않아요.
+        <a href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></p>
+      <div id="sendMsg" hidden></div>
       <div id="finishMsg" hidden></div>
       <button type="button" class="btn big" id="finishBtn" style="margin-top:12px">끝내기 ✓</button>
       <p class="sub">끝내면 이 기기의 연습 기록이 지워져서 다음 학생이 처음부터 시작할 수 있어요.</p>
@@ -574,6 +587,11 @@
  * 설정 · 내용
  * ========================================================= */
 const STORE_KEY = 'roleplay_prefer_v1';
+/*
+ * 결과를 받을 Apps Script 웹 앱 주소 (https://script.google.com/macros/s/.../exec).
+ * 비어 있으면 전송 버튼이 보이지 않는다.
+ */
+const SHEET_URL = '';
 const STALE_MS = 60 * 60 * 1000; // 이보다 오래된 진행 기록은 이어 하지 않음
 
 const params = new URLSearchParams(location.search);
@@ -752,6 +770,7 @@ function defaultState() {
     startedAt: null,
     rp: null, // 롤플레이 진행 상황 (화면 3)
     cardSaved: false,
+    sent: false,
   };
 }
 function loadState() {
@@ -780,6 +799,7 @@ function loadState() {
     // 라운드 순서가 바뀌기 전(A→B)의 진행 기록은 버리고 롤플레이를 처음부터
     if (saved.rp && saved.rp.order === 'BA' && saved.rp.ci < CAT_KEYS.length) base.rp = saved.rp;
     base.cardSaved = !!saved.cardSaved;
+    base.sent = !!saved.sent;
   } catch (e) { /* 저장된 값이 깨졌으면 새로 시작 */ }
   return base;
 }
@@ -2209,15 +2229,17 @@ function nextGoal(lines) {
     : '모든 대사를 한 번에 통과했어요! 다음엔 문장을 보지 않고 말해 봐요.';
 }
 
+const cardLines = d => d.cats.flatMap(c => [...c.B, ...c.A].map(l => ({ ...l, cat: c.cat })));
+const needsReview = l => l.tries.length > 1 || l.status === 'practice';
+
 /** 결과 카드: 무엇을 어떻게 말했고 다음에 무엇을 고칠지 보여 줌 */
 function paintCard(ctx, d) {
   const W = CARD_W, X = CARD_PAD, IW = W - CARD_PAD * 2, P = 24;
   let y = cardTop(ctx, d, '선호 묻기 롤플레이 결과');
   d.boxes = []; // 연습하기 버튼을 놓을 자리
 
-  const lines = [];
-  d.cats.forEach(c => [...c.B, ...c.A].forEach(l => lines.push({ ...l, cat: c.cat })));
-  const review = lines.filter(l => l.tries.length > 1 || l.status === 'practice');
+  const lines = cardLines(d);
+  const review = lines.filter(needsReview);
   const clear = lines.filter(l => !review.includes(l) && l.status === 'pass' && !l.free);
 
   /** 글자 묶음을 줄바꿈해 [줄 목록, 높이]로 */
@@ -2388,6 +2410,7 @@ const redoPtt = PTT.create($('#redoPtt'), {
     const heard = `<div>이렇게 들렸어요:</div><div class="heard en">“${esc(s.text)}”</div><div class="frags">${chips}</div>`;
     if (s.pass) {
       redoLine.rec.redo = s.text;
+      state.sent = false; // 새 결과가 생겼으니 다시 전송할 수 있게
       save();
       showMsg($('#redoResult'), 'ok', `<div class="good"><span class="mark ok">✓</span> 좋아요! 결과 카드에 적어 둘게요.</div>${heard}`);
     } else {
@@ -2409,12 +2432,14 @@ $('#redoBack').addEventListener('click', () => {
   $('#redoBox').hidden = true;
   $('#s4Main').hidden = false;
   refreshCards();
+  renderSend();
   window.scrollTo(0, 0);
 });
 
 function renderScreen4() {
   $('#cardFile').textContent = `파일 이름: ${cardFileName()}`;
   $('#saveMsg').hidden = true;
+  renderSend();
   refreshCards();
 }
 function refreshCards() {
@@ -2449,12 +2474,60 @@ $('#saveCard').addEventListener('click', () => {
   }
 });
 
+/* 선생님한테 결과 전송: Apps Script가 구글 시트에 한 줄로 저장 */
+function resultPayload() {
+  const d = cardData(), lines = cardLines(d), s = d.s;
+  const dt = d.date;
+  const detail = l => `[${l.cat.label} ${l.id}] ${l.free ? '내 이유 말하기' : l.target}\n`
+    + l.tries.map((t, i) => `  ${i + 1}차 "${t.heard}"${t.ok ? ' ✓' : ` ✕ ${t.miss.join(', ')}`}`).join('\n')
+    + (l.redo ? `\n  다시 연습 통과 "${l.redo}"` : '');
+  const reasons = {};
+  d.cats.forEach(c => {
+    const l = c.B.find(x => x.free), last = l && l.tries[l.tries.length - 1];
+    reasons[c.cat.label] = last ? last.heard : '';
+  });
+  const review = lines.filter(needsReview);
+  return {
+    lesson: '7', num: String(state.profile.num),
+    date: `${dt.getFullYear()}-${two(dt.getMonth() + 1)}-${two(dt.getDate())}`,
+    passed: s.passed, total: s.lines, avgAttempts: Number(s.avgAttempts.toFixed(1)),
+    levels: `${s.startLevel} → ${s.endLevel}`, selfEval: s.selfEval.join(' '), minutes: s.minutes,
+    goal: nextGoal(lines), reviewCount: review.length, redoCount: review.filter(l => l.redo).length,
+    detail: review.map(detail).join('\n'), reasons,
+  };
+}
+function renderSend() {
+  const b = $('#sendBtn');
+  b.closest('.start-area').querySelectorAll('#sendBtn, #sendBtn + .sub').forEach(el => { el.hidden = !SHEET_URL; });
+  b.textContent = state.sent ? '✓ 전송했어요 · 다시 전송하기' : '선생님한테 결과 전송하기';
+}
+$('#sendBtn').addEventListener('click', async () => {
+  const b = $('#sendBtn'), msg = $('#sendMsg');
+  if (!navigator.onLine) { showMsg(msg, 'err', MSG.offline); return; }
+  b.disabled = true;
+  b.textContent = '전송하는 중…';
+  try {
+    // Apps Script 응답은 읽을 수 없으므로(no-cors) 네트워크 오류가 없으면 전송으로 본다
+    await fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(resultPayload()) });
+    state.sent = true;
+    save();
+    showMsg(msg, 'ok', '✅ 선생님께 결과를 보냈어요.');
+  } catch (e) {
+    showMsg(msg, 'err', '📶 전송하지 못했어요. 인터넷을 확인하고 다시 눌러 주세요. 계속 안 되면 선생님께 알려 주세요.');
+  }
+  b.disabled = false;
+  renderSend();
+});
+
 /* 끝내기: 소리 설정만 남기고 기록을 지워 다음 학생이 처음부터 시작 */
 let skipSaveWarned = false;
 $('#finishBtn').addEventListener('click', () => {
-  if (!state.cardSaved && !skipSaveWarned) {
+  const unsent = SHEET_URL && !state.sent;
+  if ((unsent || (!SHEET_URL && !state.cardSaved)) && !skipSaveWarned) {
     skipSaveWarned = true;
-    showMsg($('#finishMsg'), 'info', '📷 아직 결과 카드를 저장하지 않았어요. 저장하지 않고 끝내려면 <b>끝내기</b>를 한 번 더 누르세요.');
+    showMsg($('#finishMsg'), 'info', unsent
+      ? '📤 아직 선생님께 결과를 전송하지 않았어요. 전송하지 않고 끝내려면 <b>끝내기</b>를 한 번 더 누르세요.'
+      : '📷 아직 결과 카드를 저장하지 않았어요. 저장하지 않고 끝내려면 <b>끝내기</b>를 한 번 더 누르세요.');
     return;
   }
   const next = defaultState();
