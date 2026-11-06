@@ -2512,6 +2512,7 @@ $('#sendBtn').addEventListener('click', async () => {
     state.sent = true;
     save();
     showMsg(msg, 'ok', '✅ 선생님께 결과를 보냈어요.');
+    $('#finishMsg').hidden = true;
   } catch (e) {
     showMsg(msg, 'err', '📶 전송하지 못했어요. 인터넷을 확인하고 다시 눌러 주세요. 계속 안 되면 선생님께 알려 주세요.');
   }
