@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>급식 메뉴 월드컵</title>
+<title>School Lunch World Cup</title>
 <link rel="stylesheet" href="fonts/jua.css">
 <style>
   @font-face { font-family: 'Fredoka'; font-weight: 600; font-display: swap; src: url(fonts/fredoka-latin-600-normal.woff2) format('woff2'); }
@@ -59,7 +59,7 @@
   @keyframes fall { to { transform: translateY(125vh) rotate(300deg); } }
   #intro > :not(.bits) { position: relative; }
   #intro .badge { padding: 8px 22px; border-radius: 999px; background: var(--accent); font-size: clamp(20px, 3.6vh, 32px); }
-  #intro h1 { margin: 0; font-size: clamp(50px, 12vh, 118px); font-weight: 400; line-height: 1.15; animation: pop .6s ease-out both; }
+  #intro h1 { margin: 0; font-size: clamp(50px, 12vh, 118px); font-weight: 700; line-height: 1.15; animation: pop .6s ease-out both; }
   #intro h1 span { display: block; }
   #intro .sub { margin: 0 0 12px; font-size: clamp(24px, 4.6vh, 42px); }
   @keyframes pop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -140,8 +140,8 @@
 
 <section class="screen" id="setup">
   <div class="setup-box">
-    <h1>🍱 급식 메뉴 월드컵</h1>
-    <p class="tag en">School Lunch World Cup</p>
+    <h1 class="en">🍱 School Lunch World Cup</h1>
+    <p class="tag">급식 메뉴 월드컵</p>
     <p class="setup-q">어느 반인가요?</p>
     <div class="opts" id="classOpts">
       <button type="button" class="opt" data-v="odd">홀수번호반<small>1, 3, 5 … 25번</small></button>
@@ -162,8 +162,8 @@
 <section class="screen" id="intro" hidden>
   <div class="bits" id="bits" aria-hidden="true"></div>
   <div class="badge" id="introBadge"></div>
-  <h1><span>우리의</span><span>급식 메뉴 월드컵!</span></h1>
-  <p class="sub en">Our School Lunch World Cup</p>
+  <h1 class="en"><span>Our School Lunch</span><span>World Cup!</span></h1>
+  <p class="sub">우리의 급식 메뉴 월드컵</p>
   <button type="button" class="btn big" id="introGo">게임 시작 ▶</button>
 </section>
 
