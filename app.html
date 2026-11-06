@@ -550,9 +550,6 @@
       <p class="sub">결과 카드 이미지가 선생님의 구글 드라이브로 전송돼요. 음성은 보내지 않아요.
         <a href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></p>
       <div id="sendMsg" hidden></div>
-      <div id="finishMsg" hidden></div>
-      <button type="button" class="btn big" id="finishBtn" style="margin-top:12px">끝내기 ✓</button>
-      <p class="sub">끝내면 이 기기의 연습 기록이 지워져서 다음 학생이 처음부터 시작할 수 있어요.</p>
     </div>
     </div>
 
@@ -2499,29 +2496,11 @@ $('#sendBtn').addEventListener('click', async () => {
     state.sent = true;
     save();
     showMsg(msg, 'ok', '✅ 선생님께 결과를 보냈어요.');
-    $('#finishMsg').hidden = true;
   } catch (e) {
     showMsg(msg, 'err', '📶 전송하지 못했어요. 인터넷을 확인하고 다시 눌러 주세요. 계속 안 되면 선생님께 알려 주세요.');
   }
   b.disabled = false;
   renderSend();
-});
-
-/* 끝내기: 소리 설정만 남기고 기록을 지워 다음 학생이 처음부터 시작 */
-let skipSaveWarned = false;
-$('#finishBtn').addEventListener('click', () => {
-  const unsent = SHEET_URL && !state.sent;
-  if ((unsent || (!SHEET_URL && !state.cardSaved)) && !skipSaveWarned) {
-    skipSaveWarned = true;
-    showMsg($('#finishMsg'), 'info', unsent
-      ? '📤 아직 선생님께 결과를 전송하지 않았어요. 전송하지 않고 끝내려면 <b>끝내기</b>를 한 번 더 누르세요.'
-      : '📷 아직 결과 카드를 저장하지 않았어요. 저장하지 않고 끝내려면 <b>끝내기</b>를 한 번 더 누르세요.');
-    return;
-  }
-  const next = defaultState();
-  next.settings = state.settings;
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(next)); } catch (e) { /* 무시 */ }
-  location.reload();
 });
 
 /* =========================================================
